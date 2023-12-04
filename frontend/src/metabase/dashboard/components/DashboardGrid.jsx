@@ -444,6 +444,7 @@ class DashboardGrid extends Component {
         compactType="vertical"
         items={this.getVisibleCards()}
         itemRenderer={this.renderGridItem}
+        resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
       />
     );
   }
