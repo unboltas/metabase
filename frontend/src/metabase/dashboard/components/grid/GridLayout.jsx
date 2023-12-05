@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useMemo, useState } from "react";
 import { Responsive as ReactGridLayout } from "react-grid-layout";
+import { Box } from "metabase/ui";
 
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
-import { generateGridBackground } from "./utils";
+import { GridBackground } from "./GridBackground";
 
 export function GridLayout({
   items,
@@ -94,18 +95,12 @@ export function GridLayout({
     return (cellSize.height + verticalMargin) * lowestLayoutCellPoint;
   }, [cellSize.height, layout, margin, isEditing]);
 
-  const background = useMemo(
-    () => generateGridBackground({ cellSize, margin, cols, gridWidth }),
-    [cellSize, gridWidth, margin, cols],
-  );
-
   const style = useMemo(
     () => ({
       width: gridWidth,
       height,
-      background: isEditing ? background : "",
     }),
-    [gridWidth, height, background, isEditing],
+    [gridWidth, height],
   );
 
   const isMobile = currentBreakpoint === "mobile";
@@ -114,22 +109,45 @@ export function GridLayout({
   const children = useMemo(() => items.map(renderItem), [items, renderItem]);
 
   return (
-    <ReactGridLayout
-      breakpoints={breakpoints}
-      cols={columnsMap}
-      layouts={layouts}
-      width={gridWidth}
-      margin={margin}
-      rowHeight={rowHeight}
-      isDraggable={isEditing && !isMobile}
-      isResizable={isEditing && !isMobile}
-      {...props}
-      autoSize={false}
-      onLayoutChange={onLayoutChangeWrapped}
-      onBreakpointChange={onBreakpointChange}
-      style={style}
-    >
-      {children}
-    </ReactGridLayout>
+    <>
+      <ReactGridLayout
+        breakpoints={breakpoints}
+        cols={columnsMap}
+        layouts={layouts}
+        width={gridWidth}
+        margin={margin}
+        rowHeight={rowHeight}
+        isDraggable={isEditing && !isMobile}
+        isResizable={isEditing && !isMobile}
+        {...props}
+        autoSize={false}
+        onLayoutChange={onLayoutChangeWrapped}
+        onBreakpointChange={onBreakpointChange}
+        style={style}
+      >
+        {children}
+      </ReactGridLayout>
+      {isEditing && !isMobile && (
+        <Box
+          id="proto-grid"
+          pos="absolute"
+          top={0}
+          left={0}
+          w="100%"
+          h="100%"
+          // TODO Don't hardcode this
+          px="2rem"
+          pt="21px"
+        >
+          <GridBackground
+            cellMargin={margin}
+            cellSize={cellSize}
+            cols={cols}
+            width={gridWidth}
+            height={height}
+          />
+        </Box>
+      )}
+    </>
   );
 }
