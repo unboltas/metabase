@@ -135,8 +135,7 @@ export function GridLayout({
           left={0}
           w="100%"
           h="100%"
-          // TODO Don't hardcode this
-          px="2rem"
+          // // TODO Don't hardcode this
           pt="21px"
         >
           <GridBackground

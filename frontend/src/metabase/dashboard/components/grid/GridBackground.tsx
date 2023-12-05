@@ -1,7 +1,18 @@
 import { useCallback, useState } from "react";
 import _ from "underscore";
+import { t } from "ttag";
 import styled from "@emotion/styled";
+import { Menu } from "metabase/ui";
+import { Icon } from "metabase/core/components/Icon";
 import { color } from "metabase/lib/colors";
+import { useDispatch, useSelector } from "metabase/lib/redux";
+import {
+  addCardToDashboard,
+  addHeadingDashCardToDashboard,
+  addMarkdownDashCardToDashboard,
+  addLinkDashCardToDashboard,
+} from "metabase/dashboard/actions";
+import { getDashboard, getSelectedTabId } from "metabase/dashboard/selectors";
 
 interface GridBackgroundProps {
   cellSize: { width: number; height: number };
@@ -72,35 +83,165 @@ export function GridBackground({
     [selectedPoint, hoveredPoint],
   );
 
+  const dispatch = useDispatch();
+
+  const dashId = useSelector(getDashboard).id;
+  const tabId = useSelector(getSelectedTabId);
+
+  const nextCardPosition =
+    !!selectedPoint && !!secondPoint
+      ? {
+          col: selectedPoint.x,
+          row: selectedPoint.y,
+          size_x: Math.abs(selectedPoint.x - secondPoint.x) + 1,
+          size_y: Math.abs(selectedPoint.y - secondPoint.y) + 1,
+        }
+      : {};
+
+  const handleAddQuestion = () => {
+    dispatch(
+      addCardToDashboard({
+        dashId,
+        cardId: 1,
+        tabId,
+        position: nextCardPosition,
+      }),
+    );
+    setSelectedPoint(null);
+    setSecondPoint(null);
+  };
+
+  const handleAddHeading = () => {
+    dispatch(
+      addHeadingDashCardToDashboard({
+        dashId,
+        tabId,
+        position: nextCardPosition,
+      }),
+    );
+    setSelectedPoint(null);
+    setSecondPoint(null);
+  };
+
+  const handleAddText = () => {
+    dispatch(
+      addMarkdownDashCardToDashboard({
+        dashId,
+        tabId,
+        position: nextCardPosition,
+      }),
+    );
+    setSelectedPoint(null);
+    setSecondPoint(null);
+  };
+
+  const handleAddLink = () => {
+    dispatch(
+      addLinkDashCardToDashboard({
+        dashId,
+        tabId,
+        position: nextCardPosition,
+      }),
+    );
+    setSelectedPoint(null);
+    setSecondPoint(null);
+  };
+
   return (
-    <svg width={width} height={height}>
-      {_.times(rows, rowIndex =>
-        _.times(cols, colIndex => {
-          const x = colIndex * (cellSize.width + horizontalMargin);
-          const y = rowIndex * rowHeight;
+    <Menu opened={!!selectedPoint && !!secondPoint} withinPortal>
+      <Menu.Dropdown>
+        <Menu.Item icon={<Icon name="insight" />} onClick={handleAddQuestion}>
+          {t`Question`}
+        </Menu.Item>
+        <Menu.Item icon={<Icon name="string" />} onClick={handleAddHeading}>
+          {t`Heading`}
+        </Menu.Item>
+        <Menu.Item icon={<Icon name="list" />} onClick={handleAddText}>
+          {t`Text box`}
+        </Menu.Item>
+        <Menu.Item icon={<Icon name="link" />} onClick={handleAddLink}>
+          {t`Link`}
+        </Menu.Item>
+        <Menu.Item icon={<Icon name="filter" />} disabled>
+          {t`Filter`}
+        </Menu.Item>
+        <Menu.Item icon={<Icon name="click" />} disabled>
+          {t`Button`}
+        </Menu.Item>
+      </Menu.Dropdown>
+      <svg width={width} height={height}>
+        {_.times(rows, rowIndex =>
+          _.times(cols, colIndex => {
+            const point = { x: colIndex, y: rowIndex };
+            const key = `${point.x}:${point.y}`;
 
-          const key = `${x}:${y}`;
-          const point = { x, y };
+            const x = colIndex * (cellSize.width + horizontalMargin);
+            const y = rowIndex * rowHeight;
 
-          return (
-            <ActiveSvgRect
-              key={key}
-              x={x}
-              y={y}
-              {...cellSize}
-              strokeWidth={1}
-              isActive={checkPointActive(point)}
-              onClick={() => handleCellClick(point)}
-              onMouseOver={
-                selectedPoint && !secondPoint
-                  ? () => setHoveredPoint(point)
-                  : undefined
-              }
-            />
-          );
-        }),
-      )}
-    </svg>
+            const cell = (
+              <ActiveSvgRect
+                key={key}
+                x={x}
+                y={y}
+                {...cellSize}
+                strokeWidth={1}
+                isActive={checkPointActive(point)}
+                onClick={() => handleCellClick(point)}
+                onMouseOver={
+                  selectedPoint && !secondPoint
+                    ? () => setHoveredPoint(point)
+                    : undefined
+                }
+              />
+            );
+
+            if (
+              selectedPoint &&
+              secondPoint &&
+              isSamePoint(point, secondPoint)
+            ) {
+              return <Menu.Target key={key}>{cell}</Menu.Target>;
+            }
+
+            // if (selectedPoint && secondPoint && isSamePoint(point, secondPoint)) {
+            //   const size_x = Math.abs(selectedPoint.x - secondPoint.x) + 1;
+            //   const size_y = Math.abs(selectedPoint.y - secondPoint.y) + 1;
+
+            //   const nextCardPosition = {
+            //     col: point.x,
+            //     row: point.y,
+            //     size_x,
+            //     size_y,
+            //   };
+
+            //   return (
+            //     <NewDashCardMenu
+            //       defaultOpened
+            //       nextCardPosition={nextCardPosition}
+            //     >
+            //       <ActiveSvgRect
+            //         key={key}
+            //         x={x}
+            //         y={y}
+            //         {...cellSize}
+            //         strokeWidth={1}
+            //         isActive={checkPointActive(point)}
+            //         onClick={() => handleCellClick(point)}
+            //         onMouseOver={
+            //           selectedPoint && !secondPoint
+            //             ? () => setHoveredPoint(point)
+            //             : undefined
+            //         }
+            //       />
+            //     </NewDashCardMenu>
+            //   );
+            // }
+
+            return cell;
+          }),
+        )}
+      </svg>
+    </Menu>
   );
 }
 

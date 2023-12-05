@@ -465,24 +465,6 @@ class DashboardGrid extends Component {
         onLayoutChange={this.onLayoutChange}
         onDrag={this.onDrag}
         onDrop={(nextLayout, item, event) => {
-          console.log("### onDrop", {
-            layout: layouts.desktop,
-            nextLayout,
-            item,
-            outsideDraggedCardId,
-            addCardToDashboard: {
-              dashId: dashboard.id,
-              cardId: outsideDraggedCardId,
-              tabId: selectedTabId,
-              position: {
-                col: item.x,
-                row: item.y,
-                size_x: item.w,
-                size_y: item.h,
-              },
-            },
-          });
-
           addCardToDashboard({
             dashId: dashboard.id,
             cardId: outsideDraggedCardId,
@@ -500,7 +482,7 @@ class DashboardGrid extends Component {
         }}
         onDragStop={this.onDragStop}
         isEditing={this.isEditingLayout}
-        compactType="vertical"
+        compactType={null}
         items={this.getVisibleCards()}
         itemRenderer={this.renderGridItem}
       />
@@ -510,7 +492,10 @@ class DashboardGrid extends Component {
   render() {
     const { width } = this.props;
     return (
-      <div className="flex layout-centered" data-testid="dashboard-grid">
+      <div
+        className="flex layout-centered relative"
+        data-testid="dashboard-grid"
+      >
         {width > 0 ? this.renderGrid() : <div />}
         {this.renderAddSeriesModal()}
       </div>

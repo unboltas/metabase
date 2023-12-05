@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { t } from "ttag";
+import type { MenuProps } from "metabase/ui";
 import { Menu } from "metabase/ui";
 import { Icon } from "metabase/core/components/Icon";
 import { useDispatch, useSelector } from "metabase/lib/redux";
@@ -11,14 +11,19 @@ import {
 } from "metabase/dashboard/actions";
 import { getDashboard, getSelectedTabId } from "metabase/dashboard/selectors";
 
-interface NewDashCardMenuProps {
-  nextCardPosition: { col: number; row: number };
-  children: ReactNode;
+interface NewDashCardMenuProps extends MenuProps {
+  nextCardPosition: {
+    col: number;
+    row: number;
+    size_x?: number;
+    size_y?: number;
+  };
 }
 
 export function NewDashCardMenu({
   nextCardPosition,
   children,
+  ...props
 }: NewDashCardMenuProps) {
   const dispatch = useDispatch();
 
@@ -67,7 +72,7 @@ export function NewDashCardMenu({
   };
 
   return (
-    <Menu>
+    <Menu {...props}>
       <Menu.Target>{children}</Menu.Target>
       <Menu.Dropdown>
         <Menu.Item icon={<Icon name="insight" />} onClick={handleAddQuestion}>
