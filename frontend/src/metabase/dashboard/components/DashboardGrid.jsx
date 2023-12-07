@@ -315,6 +315,34 @@ class DashboardGrid extends Component {
     this.setState({ addSeriesModalDashCard: dc });
   }
 
+  onReplaceCard(dc) {
+    const {
+      dashboard,
+      selectedTabId,
+      addCardToDashboard,
+      removeCardFromDashboard,
+    } = this.props;
+
+    const position = _.pick(dc, "col", "row", "size_x", "size_y");
+
+    removeCardFromDashboard({
+      dashcardId: dc.id,
+      cardId: dc.card_id,
+    });
+
+    const excludeCardId = dc.card_id;
+    const cardIds = [1, 4, 6, 8];
+
+    const cardId = _.sample(_.without(cardIds, excludeCardId));
+
+    addCardToDashboard({
+      dashId: dashboard.id,
+      tabId: selectedTabId,
+      cardId,
+      position,
+    });
+  }
+
   getDashboardCardIcon = dashCard => {
     const { isRegularCollection } = PLUGIN_COLLECTIONS;
     const { dashboard } = this.props;
@@ -361,6 +389,7 @@ class DashboardGrid extends Component {
         isXray={this.props.isXray}
         onRemove={this.onDashCardRemove.bind(this, dc)}
         onAddSeries={this.onDashCardAddSeries.bind(this, dc)}
+        onReplaceCard={this.onReplaceCard.bind(this, dc)}
         onUpdateVisualizationSettings={this.props.onUpdateDashCardVisualizationSettings.bind(
           this,
           dc.id,
