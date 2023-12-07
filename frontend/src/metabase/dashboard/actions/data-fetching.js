@@ -290,7 +290,11 @@ export const fetchDashboard = createAsyncThunk(
 
 export const fetchCardData = createThunkAction(
   FETCH_CARD_DATA,
-  function (card, dashcard, { reload, clearCache, ignoreCache } = {}) {
+  function (
+    card,
+    dashcard,
+    { reload, clearCache, ignoreCache, useCardQueryEndpoint } = {},
+  ) {
     return async function (dispatch, getState) {
       dispatch({
         type: FETCH_CARD_DATA_PENDING,
@@ -422,7 +426,9 @@ export const fetchCardData = createThunkAction(
       } else {
         // new dashcards and new additional series cards aren't yet saved to the dashboard, so they need to be run using the card query endpoint
         const endpoint =
-          isNewDashcard(dashcard) || isNewAdditionalSeriesCard(card, dashcard)
+          useCardQueryEndpoint ||
+          isNewDashcard(dashcard) ||
+          isNewAdditionalSeriesCard(card, dashcard)
             ? CardApi.query
             : DashboardApi.cardQuery;
 

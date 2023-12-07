@@ -316,30 +316,16 @@ class DashboardGrid extends Component {
   }
 
   onReplaceCard(dc) {
-    const {
-      dashboard,
-      selectedTabId,
-      addCardToDashboard,
-      removeCardFromDashboard,
-    } = this.props;
-
-    const position = _.pick(dc, "col", "row", "size_x", "size_y");
-
-    removeCardFromDashboard({
-      dashcardId: dc.id,
-      cardId: dc.card_id,
-    });
+    const { replaceCard } = this.props;
 
     const excludeCardId = dc.card_id;
     const cardIds = [1, 4, 6, 8];
 
     const cardId = _.sample(_.without(cardIds, excludeCardId));
 
-    addCardToDashboard({
-      dashId: dashboard.id,
-      tabId: selectedTabId,
-      cardId,
-      position,
+    replaceCard({
+      dashcardId: dc.id,
+      nextCardId: cardId,
     });
   }
 

@@ -11,14 +11,15 @@ import {
 import { createCard } from "metabase/lib/card";
 
 import { getVisualizationRaw } from "metabase/visualizations";
-// import { autoWireParametersToNewCard } from "metabase/dashboard/actions/auto-wire-parameters/actions";
+import { autoWireParametersToNewCard } from "metabase/dashboard/actions/auto-wire-parameters/actions";
 import { trackCardCreated } from "../analytics";
-import { getDashCardById } from "../selectors";
+import { getDashCardById, getDashboardId } from "../selectors";
 import { isVirtualDashCard } from "../utils";
 import {
   ADD_CARD_TO_DASH,
   REMOVE_CARD_FROM_DASH,
   UNDO_REMOVE_CARD_FROM_DASH,
+  setDashCardAttributes,
 } from "./core";
 import { cancelFetchCardData, fetchCardData } from "./data-fetching";
 import { loadMetadataForDashboard } from "./metadata";
@@ -75,12 +76,52 @@ export const addCardToDashboard =
 
     await dispatch(loadMetadataForDashboard([dashcard]));
 
-    // dispatch(
-    //   autoWireParametersToNewCard({
-    //     dashboard_id: dashId,
-    //     dashcard_id: dashcardId,
-    //   }),
-    // );
+    dispatch(
+      autoWireParametersToNewCard({
+        dashboard_id: dashId,
+        dashcard_id: dashcardId,
+      }),
+    );
+  };
+
+export const replaceCard =
+  ({ dashcardId, nextCardId }) =>
+  async (dispatch, getState) => {
+    await dispatch(Questions.actions.fetch({ id: nextCardId }));
+    const card = Questions.selectors
+      .getObject(getState(), { entityId: nextCardId })
+      .card();
+
+    const dashboardId = getDashboardId(getState());
+
+    await dispatch(
+      setDashCardAttributes({
+        id: dashcardId,
+        attributes: {
+          card,
+          card_id: card.id,
+          series: [],
+          parameter_mappings: [],
+          visualization_settings: {},
+        },
+      }),
+    );
+    const dashcard = getDashCardById(getState(), dashcardId);
+
+    dispatch(
+      fetchCardData(card, dashcard, {
+        reload: true,
+        clearCache: true,
+        useCardQueryEndpoint: true,
+      }),
+    );
+    await dispatch(loadMetadataForDashboard([dashcard]));
+    dispatch(
+      autoWireParametersToNewCard({
+        dashboard_id: dashboardId,
+        dashcard_id: dashcardId,
+      }),
+    );
   };
 
 export const removeCardFromDashboard = createThunkAction(
