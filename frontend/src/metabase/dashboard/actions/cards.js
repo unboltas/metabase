@@ -11,7 +11,7 @@ import {
 import { createCard } from "metabase/lib/card";
 
 import { getVisualizationRaw } from "metabase/visualizations";
-import { autoWireParametersToNewCard } from "metabase/dashboard/actions/auto-wire-parameters/actions";
+// import { autoWireParametersToNewCard } from "metabase/dashboard/actions/auto-wire-parameters/actions";
 import { trackCardCreated } from "../analytics";
 import { getDashCardById } from "../selectors";
 import { isVirtualDashCard } from "../utils";
@@ -75,12 +75,12 @@ export const addCardToDashboard =
 
     await dispatch(loadMetadataForDashboard([dashcard]));
 
-    dispatch(
-      autoWireParametersToNewCard({
-        dashboard_id: dashId,
-        dashcard_id: dashcardId,
-      }),
-    );
+    // dispatch(
+    //   autoWireParametersToNewCard({
+    //     dashboard_id: dashId,
+    //     dashcard_id: dashcardId,
+    //   }),
+    // );
   };
 
 export const removeCardFromDashboard = createThunkAction(
