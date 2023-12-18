@@ -74,7 +74,7 @@ export function removeDashboardCard(index = 0) {
     .realHover({ scrollBehavior: "bottom" })
     .findByTestId("dashboardcard-actions-panel")
     .icon("close")
-    .click();
+    .click({ force: true });
 }
 
 export function showDashcardVisualizationSettings(index = 0) {
