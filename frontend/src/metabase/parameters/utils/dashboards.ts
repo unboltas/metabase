@@ -136,7 +136,11 @@ function buildFieldFilterUiParameter(
   const mappingsForParameter = mappings.filter(
     mapping => mapping.parameter_id === parameter.id,
   );
-  const mappedFields = mappingsForParameter.map(mapping => {
+  const uniqueMappingsForParameters = _.uniq(mappingsForParameter, mapping =>
+    JSON.stringify(mapping.target),
+  );
+
+  const mappedFields = uniqueMappingsForParameters.map(mapping => {
     const { target, card } = mapping;
 
     try {
@@ -157,24 +161,21 @@ function buildFieldFilterUiParameter(
     return isVariableTarget(mapping.target);
   });
 
-  const uniqueFields = _.uniq(
-    mappedFields
-      .filter(
-        (
-          mappedField,
-        ): mappedField is { field: Field; shouldResolveFkField: boolean } => {
-          return mappedField.field != null;
-        },
-      )
-      .map(({ field, shouldResolveFkField }) => {
-        return shouldResolveFkField ? field.target ?? field : field;
-      }),
-    field => field.id,
-  );
+  const fields = mappedFields
+    .filter(
+      (
+        mappedField,
+      ): mappedField is { field: Field; shouldResolveFkField: boolean } => {
+        return mappedField.field != null;
+      },
+    )
+    .map(({ field, shouldResolveFkField }) => {
+      return shouldResolveFkField ? field.target ?? field : field;
+    });
 
   return {
     ...parameter,
-    fields: uniqueFields,
+    fields: fields,
     hasVariableTemplateTagTarget,
   };
 }
