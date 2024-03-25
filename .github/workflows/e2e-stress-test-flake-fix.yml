@@ -45,7 +45,6 @@ jobs:
     env:
       DISPLAY: ""
       QA_DB_ENABLED: true
-      CYPRESS_REPLAYIO_ENABLED: 1
       CYPRESS_ALL_FEATURES_TOKEN: ${{ secrets.ENTERPRISE_TOKEN }}
       CYPRESS_NO_FEATURES_TOKEN: ${{ secrets.E2E_STARTER_TOKEN }}
       MB_SNOWPLOW_AVAILABLE: true
@@ -95,7 +94,6 @@ jobs:
           --spec '${{ github.event.inputs.spec }}' \
           --env burn=${{ github.event.inputs.burn_in }},grep='${{ github.event.inputs.grep }}' \
           --config-file e2e/support/cypress-stress-test.config.js \
-          --browser 'replay-chromium'
 
       - name: Upload Cypress Artifacts upon failure
         uses: actions/upload-artifact@v4
