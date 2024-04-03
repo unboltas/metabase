@@ -152,38 +152,24 @@
                         {:source-query {:source-table $$venues
                                         :expressions  {"big_price"
                                                        [:+
-                                                        [:field %price {::add/position      1
-                                                                        ::add/source-table  $$venues
-                                                                        ::add/source-alias  "PRICE"
-                                                                        ::add/desired-alias "PRICE"}]
+                                                        [:field %price {::add/source-table $$venues
+                                                                        ::add/source-alias "PRICE"}]
                                                         2]
 
                                                        "my_cool_new_field"
                                                        [:/
-                                                        [:field %price {::add/position      1
-                                                                        ::add/source-table  $$venues
-                                                                        ::add/source-alias  "PRICE"
-                                                                        ::add/desired-alias "PRICE"}]
-                                                        [:expression "big_price" {::add/position      2
-                                                                                  ::add/desired-alias "big_price"}]]}
-                                        :fields [[:field %id {::add/position      0
-                                                              ::add/source-table  $$venues
+                                                        [:field %price {::add/source-table $$venues
+                                                                        ::add/source-alias "PRICE"}]
+                                                        [:expression "big_price" {}]]}
+                                        :fields [[:field %id {::add/source-table  $$venues
                                                               ::add/source-alias  "ID"
                                                               ::add/desired-alias "ID"}]
-                                                 [:field %price {::add/position      1
-                                                                 ::add/source-table  $$venues
-                                                                 ::add/source-alias  "PRICE"
-                                                                 ::add/desired-alias "PRICE"}]
-                                                 [:expression "big_price" {::add/position      2
-                                                                           ::add/desired-alias "big_price"}]
-                                                 [:expression "my_cool_new_field" {::add/position      3
-                                                                                   ::add/desired-alias "my_cool_new_field"}]]}
+                                                 [:expression "my_cool_new_field" {}]]}
                          :fields   [[:field "my_cool_new_field" {:base-type          :type/Float
-                                                                 ::add/position      0
                                                                  ::add/source-table  ::add/source
                                                                  ::add/source-alias  "my_cool_new_field"
                                                                  ::add/desired-alias "my_cool_new_field"}]]
-                         :order-by [[:asc [:field %id {::add/source-table ::add/source
+                         :order-by [[:asc [:field "ID" {::add/source-table ::add/source
                                                        ::add/source-alias "ID"}]]]
                          :limit    3})
                       (-> (lib.tu.macros/mbql-query venues
@@ -208,59 +194,39 @@
                        :fields       [$id [:expression "x"]]
                        :limit        1})]
           (mt/with-native-query-testing-context query
-            (is (partial= (lib.tu.macros/$ids venues
-                            {:fields
-                             [[:field %id #::add{:source-table  ::add/source
-                                                 :source-alias  "ID"
-                                                 :desired-alias "ID"
-                                                 :position      0}]
-                              [:field "x_2" {:base-type          :type/Float
-                                             ::add/source-table  ::add/source
-                                             ::add/source-alias  "x_2"
-                                             ::add/desired-alias "x_2"
-                                             ::add/position      1}]]
-                             :source-query
-                             {:expressions
-                              {"x" [:*
-                                    [:field %price #::add{:source-table ::add/source
-                                                          :source-alias "PRICE"}]
-                                    4]}
-                              :fields
-                              [[:field %id #::add{:source-table  ::add/source
-                                                  :source-alias  "ID"
-                                                  :desired-alias "ID"}]
-                               [:field "x" {:base-type          :type/Float
-                                            ::add/source-table  ::add/source
-                                            ::add/source-alias  "x"
-                                            ::add/desired-alias "x"}]
-                               [:expression "x" #::add{:desired-alias "x_2"}]]
-                              :source-query
-                              {:fields
-                               [[:field %id #::add{:source-table  ::add/source
-                                                   :source-alias  "ID"
-                                                   :desired-alias "ID"}]
-                                [:field "x" {:base-type          :type/Float
-                                             ::add/source-table  ::add/source
-                                             ::add/source-alias  "x"
-                                             ::add/desired-alias "x"}]]
-                               :source-query
-                               {:source-table $$venues
-                                :expressions
-                                {"x" [:*
-                                      [:field %price #::add{:source-table  $$venues
-                                                            :source-alias  "PRICE"
-                                                            :desired-alias "PRICE"}]
-                                      2]}
-                                :fields
-                                [[:field %id #::add{:source-table  $$venues
-                                                    :source-alias  "ID"
-                                                    :desired-alias "ID"}]
-                                 [:field %price #::add{:source-table  $$venues
-                                                       :source-alias  "PRICE"
-                                                       :desired-alias "PRICE"}]
-                                 [:expression "x" #::add{:desired-alias "x"}]]}}}
-                             :limit 1})
-                          (-> query add/add-alias-info nest-expressions)))))))))
+            (is (=? (lib.tu.macros/$ids venues
+                      {:source-query {:source-query {:source-query {:source-table $$venues
+                                                                    :expressions  {"x" [:*
+                                                                                        [:field %price {::add/source-table $$venues
+                                                                                                        ::add/source-alias "PRICE"}]
+                                                                                        2]}
+                                                                    :fields       [[:field %id {::add/source-table  $$venues
+                                                                                                ::add/source-alias  "ID"
+                                                                                                ::add/desired-alias "ID"}]
+                                                                                   [:expression "x" {::add/desired-alias "x"}]]}
+                                                     :fields       [[:field "ID" {::add/source-table  ::add/source
+                                                                                  ::add/source-alias  "ID"
+                                                                                  ::add/desired-alias "ID"}]
+                                                                    [:field "x" {::add/source-table  ::add/source
+                                                                                 ::add/source-alias  "x"
+                                                                                 ::add/desired-alias "x"}]]}
+                                      :expressions  {"x" [:*
+                                                          [:field %price {::add/source-table ::add/source
+                                                                          ::add/source-alias "PRICE"}]
+                                                          4]}
+                                      :fields       [[:field "ID" {::add/source-table ::add/source
+                                                                   ::add/source-alias  "ID"
+                                                                   ::add/desired-alias "ID"}]
+                                                     [:expression "x" {::add/desired-alias "x"}]]}
+                       :fields       [[:field %id {::add/source-table  ::add/source
+                                                   ::add/source-alias  "ID"
+                                                   ::add/desired-alias "ID"}]
+                                      [:field "x" {::add/source-table ::add/source
+                                                   ::add/source-alias "x"
+                                                   ::add/desired-alias "x"}]]
+
+                       :limit 1})
+                    (-> query add/add-alias-info nest-expressions)))))))))
 
 (deftest ^:parallel nest-expressions-ignore-source-queries-from-joins-test
   (testing "Ignores source-query from joins (#20809)"
@@ -347,19 +313,19 @@
                                                                        [:field %category-id {::add/source-table  $$venues
                                                                                              ::add/source-alias  "CATEGORY_ID"
                                                                                              ::add/desired-alias "CATEGORY_ID"
-                                                                                             ::add/position      2}]
+                                                                                             }]
                                                                        [:field %category-id {:join-alias         "CategoriesStats"
                                                                                              ::add/source-table  "CategoriesStats"
                                                                                              ::add/source-alias  "CATEGORY_ID"
                                                                                              ::add/desired-alias "CategoriesStats__CATEGORY_ID"
-                                                                                             ::add/position      7}]]
+                                                                                             }]]
                                                         :source-query {:source-table $$venues
                                                                        :aggregation  [[:aggregation-options
                                                                                        [:max [:field %price {::add/source-table $$venues
                                                                                                              ::add/source-alias "PRICE"}]]
                                                                                        {:name               "MaxPrice"
                                                                                         ::add/desired-alias "MaxPrice"
-                                                                                        ::add/position      1}]
+                                                                                        }]
                                                                                       [:aggregation-options
                                                                                        [:avg
                                                                                         [:field
@@ -368,157 +334,157 @@
                                                                                           ::add/source-alias "PRICE"}]]
                                                                                        {:name               "AvgPrice"
                                                                                         ::add/desired-alias "AvgPrice"
-                                                                                        ::add/position      2}]
+                                                                                        }]
                                                                                       [:aggregation-options
                                                                                        [:min [:field %price {::add/source-table $$venues
                                                                                                              ::add/source-alias "PRICE"}]]
                                                                                        {:name               "MinPrice"
                                                                                         ::add/desired-alias "MinPrice"
-                                                                                        ::add/position      3}]]
+                                                                                        }]]
                                                                        :breakout     [[:field %category-id {::add/source-table  $$venues
                                                                                                             ::add/source-alias  "CATEGORY_ID"
                                                                                                             ::add/desired-alias "CATEGORY_ID"
-                                                                                                            ::add/position      0}]]
+                                                                                                            }]]
                                                                        :order-by     [[:asc [:field %category-id {::add/source-table  $$venues
                                                                                                                   ::add/source-alias  "CATEGORY_ID"
                                                                                                                   ::add/desired-alias "CATEGORY_ID"
-                                                                                                                  ::add/position      0}]]]}
+                                                                                                                  }]]]}
                                                         :alias        "CategoriesStats"
                                                         :fields       [[:field %category-id {:join-alias         "CategoriesStats"
                                                                                              ::add/source-table  "CategoriesStats"
                                                                                              ::add/source-alias  "CATEGORY_ID"
                                                                                              ::add/desired-alias "CategoriesStats__CATEGORY_ID"
-                                                                                             ::add/position      7}]
+                                                                                             }]
                                                                        [:field "MaxPrice" {:base-type          :type/Integer
                                                                                            :join-alias         "CategoriesStats"
                                                                                            ::add/source-table  "CategoriesStats"
                                                                                            ::add/source-alias  "MaxPrice"
                                                                                            ::add/desired-alias "CategoriesStats__MaxPrice"
-                                                                                           ::add/position      8}]
+                                                                                           }]
                                                                        [:field "AvgPrice" {:base-type          :type/Float
                                                                                            :join-alias         "CategoriesStats"
                                                                                            ::add/source-table  "CategoriesStats"
                                                                                            ::add/source-alias  "AvgPrice"
                                                                                            ::add/desired-alias "CategoriesStats__AvgPrice"
-                                                                                           ::add/position      9}]
+                                                                                           }]
                                                                        [:field "MinPrice" {:base-type          :type/Integer
                                                                                            :join-alias         "CategoriesStats"
                                                                                            ::add/source-table  "CategoriesStats"
                                                                                            ::add/source-alias  "MinPrice"
                                                                                            ::add/desired-alias "CategoriesStats__MinPrice"
-                                                                                           ::add/position      10}]]}]
+                                                                                           }]]}]
                                         :expressions  {"RelativePrice" [:/
                                                                         [:field %price {::add/source-table  $$venues
                                                                                         ::add/source-alias  "PRICE"
                                                                                         ::add/desired-alias "PRICE"
-                                                                                        ::add/position      5}]
+                                                                                        }]
                                                                         [:field "AvgPrice" {:base-type          :type/Integer
                                                                                             :join-alias         "CategoriesStats"
                                                                                             ::add/source-table  "CategoriesStats"
                                                                                             ::add/source-alias  "AvgPrice"
                                                                                             ::add/desired-alias "CategoriesStats__AvgPrice"
-                                                                                            ::add/position      9}]]}
+                                                                                            }]]}
                                         :fields       [[:field %id {::add/source-table  $$venues
                                                                     ::add/source-alias  "ID"
                                                                     ::add/desired-alias "ID"
-                                                                    ::add/position      0}]
+                                                                    }]
                                                        [:field %name {::add/source-table  $$venues
                                                                       ::add/source-alias  "NAME"
                                                                       ::add/desired-alias "NAME"
-                                                                      ::add/position      1}]
+                                                                      }]
                                                        [:field %category-id {::add/source-table  $$venues
                                                                              ::add/source-alias  "CATEGORY_ID"
                                                                              ::add/desired-alias "CATEGORY_ID"
-                                                                             ::add/position      2}]
+                                                                             }]
                                                        [:field %latitude {::add/source-table  $$venues
                                                                           ::add/source-alias  "LATITUDE"
                                                                           ::add/desired-alias "LATITUDE"
-                                                                          ::add/position      3}]
+                                                                          }]
                                                        [:field %longitude {::add/source-table  $$venues
                                                                            ::add/source-alias  "LONGITUDE"
                                                                            ::add/desired-alias "LONGITUDE"
-                                                                           ::add/position      4}]
+                                                                           }]
                                                        [:field %price {::add/source-table  $$venues
                                                                        ::add/source-alias  "PRICE"
                                                                        ::add/desired-alias "PRICE"
-                                                                       ::add/position      5}]
+                                                                       }]
                                                        [:expression "RelativePrice" {::add/desired-alias "RelativePrice"
-                                                                                     ::add/position      6}]
+                                                                                     }]
                                                        [:field %category-id {:join-alias         "CategoriesStats"
                                                                              ::add/source-table  "CategoriesStats"
                                                                              ::add/source-alias  "CATEGORY_ID"
                                                                              ::add/desired-alias "CategoriesStats__CATEGORY_ID"
-                                                                             ::add/position      7}]
+                                                                             }]
                                                        [:field "MaxPrice" {:base-type          :type/Integer
                                                                            :join-alias         "CategoriesStats"
                                                                            ::add/source-table  "CategoriesStats"
                                                                            ::add/source-alias  "MaxPrice"
                                                                            ::add/desired-alias "CategoriesStats__MaxPrice"
-                                                                           ::add/position      8}]
+                                                                           }]
                                                        [:field "AvgPrice" {:base-type          :type/Float
                                                                            :join-alias         "CategoriesStats"
                                                                            ::add/source-table  "CategoriesStats"
                                                                            ::add/source-alias  "AvgPrice"
                                                                            ::add/desired-alias "CategoriesStats__AvgPrice"
-                                                                           ::add/position      9}]
+                                                                           }]
                                                        [:field "MinPrice" {:base-type          :type/Integer
                                                                            :join-alias         "CategoriesStats"
                                                                            ::add/source-table  "CategoriesStats"
                                                                            ::add/source-alias  "MinPrice"
                                                                            ::add/desired-alias "CategoriesStats__MinPrice"
-                                                                           ::add/position      10}]]}
+                                                                           }]]}
                          :fields       [[:field %id {::add/source-table  ::add/source
                                                      ::add/source-alias  "ID"
                                                      ::add/desired-alias "ID"
-                                                     ::add/position      0}]
+                                                     }]
                                         [:field %name {::add/source-table  ::add/source
                                                        ::add/source-alias  "NAME"
                                                        ::add/desired-alias "NAME"
-                                                       ::add/position      1}]
+                                                       }]
                                         [:field %category-id {::add/source-table  ::add/source
                                                               ::add/source-alias  "CATEGORY_ID"
                                                               ::add/desired-alias "CATEGORY_ID"
-                                                              ::add/position      2}]
+                                                              }]
                                         [:field %latitude {::add/source-table  ::add/source
                                                            ::add/source-alias  "LATITUDE"
                                                            ::add/desired-alias "LATITUDE"
-                                                           ::add/position      3}]
+                                                           }]
                                         [:field %longitude {::add/source-table  ::add/source
                                                             ::add/source-alias  "LONGITUDE"
                                                             ::add/desired-alias "LONGITUDE"
-                                                            ::add/position      4}]
+                                                            }]
                                         [:field %price {::add/source-table  ::add/source
                                                         ::add/source-alias  "PRICE"
                                                         ::add/desired-alias "PRICE"
-                                                        ::add/position      5}]
+                                                        }]
                                         [:field "RelativePrice" {:base-type          :type/Float
                                                                  ::add/source-table  ::add/source
                                                                  ::add/source-alias  "RelativePrice"
                                                                  ::add/desired-alias "RelativePrice"
-                                                                 ::add/position      6}]
+                                                                 }]
                                         [:field %category-id {:join-alias         "CategoriesStats"
                                                               ::add/source-alias  "CategoriesStats__CATEGORY_ID"
                                                               ::add/desired-alias "CategoriesStats__CATEGORY_ID"
                                                               ::add/source-table  ::add/source
-                                                              ::add/position      7}]
+                                                              }]
                                         [:field "MaxPrice" {:base-type          :type/Integer
                                                             :join-alias         "CategoriesStats"
                                                             ::add/source-alias  "CategoriesStats__MaxPrice"
                                                             ::add/desired-alias "CategoriesStats__MaxPrice"
                                                             ::add/source-table  ::add/source
-                                                            ::add/position      8}]
+                                                            }]
                                         [:field "AvgPrice" {:base-type          :type/Integer
                                                             :join-alias         "CategoriesStats"
                                                             ::add/source-alias  "CategoriesStats__AvgPrice"
                                                             ::add/desired-alias "CategoriesStats__AvgPrice"
                                                             ::add/source-table  ::add/source
-                                                            ::add/position      9}]
+                                                            }]
                                         [:field "MinPrice" {:base-type          :type/Integer
                                                             :join-alias         "CategoriesStats"
                                                             ::add/source-alias  "CategoriesStats__MinPrice"
                                                             ::add/desired-alias "CategoriesStats__MinPrice"
                                                             ::add/source-table  ::add/source
-                                                            ::add/position      10}]]
+                                                            }]]
                          :limit        3})
                       (-> (lib.tu.macros/mbql-query venues
                             {:fields      [$id
@@ -561,18 +527,18 @@
                                         :fields       [[:field %price {::add/source-table  $$venues
                                                                        ::add/source-alias  "PRICE"
                                                                        ::add/desired-alias "PRICE"
-                                                                       ::add/position      0}]
+                                                                       }]
                                                        [:expression "test" {::add/desired-alias "test"
-                                                                            ::add/position      1}]]}
+                                                                            }]]}
                          :fields       [[:field "PRICE" {:temporal-unit      :default
                                                          ::add/source-table  ::add/source
                                                          ::add/source-alias  "PRICE"
                                                          ::add/desired-alias "PRICE"
-                                                         ::add/position      0}]
+                                                         }]
                                         [:field "test" {::add/source-table  ::add/source
                                                         ::add/source-alias  "test"
                                                         ::add/desired-alias "test"
-                                                        ::add/position      1}]]
+                                                        }]]
                          :limit        1})
                       (-> (lib.tu.macros/mbql-query venues
                             {:expressions {"test" ["*" 1 1]}
@@ -615,7 +581,7 @@
                                           {::add/source-table  ::add/source
                                            ::add/source-alias  "PRODUCTS__via__PRODUCT_ID__CATEGORY"
                                            ::add/desired-alias "PRODUCTS__via__PRODUCT_ID__CATEGORY"
-                                           ::add/position      0}]
+                                           }]
                        created-at        [:field "CREATED_AT" {:temporal-unit      :default
                                                                ::add/source-table  ::add/source
                                                                ::add/source-alias  "CREATED_AT"
