@@ -418,7 +418,7 @@
        ::position      position})))
 
 (defmethod clause-alias-info :expression
-  [inner-query unique-alias-fn [_ expression-name :as expression-ref-clause]]
+  [inner-query unique-alias-fn [_expression expression-name _opts :as expression-ref-clause]]
   (when-let [position (clause->position inner-query expression-ref-clause)]
     {::desired-alias (unique-alias-fn position expression-name)
      ::position      position}))
