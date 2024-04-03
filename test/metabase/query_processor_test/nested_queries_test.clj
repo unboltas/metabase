@@ -9,7 +9,9 @@
    [medley.core :as m]
    [metabase.driver :as driver]
    [metabase.driver.sql.query-processor-test-util :as sql.qp-test-util]
+   [metabase.lib.core :as lib]
    [metabase.lib.metadata :as lib.metadata]
+   [metabase.lib.metadata.jvm :as lib.metadata.jvm]
    [metabase.lib.schema.id :as lib.schema.id]
    [metabase.lib.test-metadata :as meta]
    [metabase.lib.test-util :as lib.tu]
@@ -20,6 +22,7 @@
    [metabase.models.interface :as mi]
    [metabase.models.permissions :as perms]
    [metabase.models.permissions-group :as perms-group]
+   [metabase.models.query :as query]
    [metabase.models.query.permissions :as query-perms]
    [metabase.query-processor :as qp]
    [metabase.query-processor.compile :as qp.compile]
@@ -1448,3 +1451,31 @@
                     {:expressions {"substring" [:substring [:field field-id nil] 1 10]}
                      :fields      [[:expression "substring"]
                                    [:field field-id nil]]}))))))))
+
+(deftest ^:parallel nested-models-with-expressions-with-the-same-name-as-a-column-test
+  (testing "#39059"
+    (mt/test-drivers (mt/normal-drivers-with-feature :nested-queries)
+      (let [metadata-provider (lib.metadata.jvm/application-database-metadata-provider (mt/id))
+            table             #(lib.metadata/table metadata-provider (mt/id %))
+            field             #(lib.metadata/field metadata-provider (mt/id %1 %2))
+            metadata-provider (-> metadata-provider
+                                  (lib.tu/metadata-provider-with-cards-for-queries
+                                   [(as-> (lib/query metadata-provider (table :orders)) query
+                                      (lib/expression query "DISCOUNT" (lib/coalesce (field :orders :discount) 0))
+                                      (lib/with-fields query [(field :orders :id)
+                                                              (field :orders :user_id)
+                                                              (field :orders :product_id)
+                                                              (field :orders :subtotal)
+                                                              (field :orders :tax)
+                                                              (field :orders :total)
+                                                              (field :orders :created_at)
+                                                              (field :orders :quantity)
+                                                              (lib/expression-ref query "DISCOUNT")])
+                                      (lib/order-by query (field :orders :id))
+                                      (lib/limit query 1))])
+                                  (lib.tu/merged-mock-metadata-provider
+                                   {:cards [{:id 1, :type :model}]}))]
+        (is (= [[1 1 14 37.65 2.07 39.72 "2019-02-11T21:40:27.892Z" 2 0.0]]
+               (mt/formatted-rows [int int int 2.0 2.0 2.0 str int 2.0]
+                 (qp/process-query
+                  (lib/query metadata-provider (lib.metadata/card metadata-provider 1))))))))))

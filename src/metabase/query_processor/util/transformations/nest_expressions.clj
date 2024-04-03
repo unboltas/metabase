@@ -44,12 +44,9 @@
          (if-let [col (lib.equality/find-matching-column &match (case tag
                                                                   :expression visible-expressions
                                                                   :field      other-visible-columns))]
-           (do
-             (println "(pr-str &match):" (metabase.util/pprint-to-str &match)) ; NOCOMMIT
-             (println "(pr-str col):" (metabase.util/pprint-to-str col))       ; NOCOMMIT
-             (-> col
-                 qp.transformations.common/update-aggregation-metadata-from-previous-stage-to-produce-correct-ref-in-current-stage
-                 lib.ref/ref))
+           (-> col
+               qp.transformations.common/update-aggregation-metadata-from-previous-stage-to-produce-correct-ref-in-current-stage
+               lib/ref)
            (do
              (log/warnf "Error nesting expressions: cannot find match for clause %s" (pr-str &match))
              &match)))))))
@@ -59,17 +56,21 @@
    path  :- ::lib.walk/stage-path
    stage :- ::lib.schema/stage]
   (when (seq (:expressions stage))
-    (let [#_returned-columns  #_(lib.walk/apply-f-for-stage-at-path lib/returned-columns query path stage) ; NOCOMMIT
-          visible-columns   (lib.walk/apply-f-for-stage-at-path lib/visible-columns query path stage)
-          _ (println "VISIBL" (metabase.util/pprint-to-str (map (juxt :lib/desired-column-alias :lib/source) visible-columns))) ; NOCOMMIT
-          second-stage      (new-second-stage stage visible-columns)
-          used-column-names (into #{} (lib.util.match/match second-stage
-                                        [:field _opts field-name]
-                                        field-name))
-          _ (println "(pr-str used-column-names):" (pr-str used-column-names)) ; NOCOMMIT
-          used-columns      (filter #(contains? used-column-names (:lib/desired-column-alias %))
-                                    visible-columns)
-          first-stage       (new-first-stage stage used-columns)]
+    (let [visible-columns              (lib.walk/apply-f-for-stage-at-path lib/visible-columns query path stage)
+          ;; do an initial calculation of the second stage so we can determine what we're using in it.
+          second-stage                 (new-second-stage stage visible-columns)
+          ;; calculate the first stage, but only return stuff used in the second stage.
+          used-column-names            (into #{} (lib.util.match/match second-stage
+                                                   [:field _opts field-name]
+                                                   field-name))
+          used-columns                 (filter #(contains? used-column-names (:lib/desired-column-alias %))
+                                               visible-columns)
+          first-stage                  (new-first-stage stage used-columns)
+          ;; recalculate the second stage using the correct returned columns for the first stage so the column aliases
+          ;; line up.
+          first-stage-returned-columns (let [query (assoc-in query path first-stage)]
+                                         (lib.walk/apply-f-for-stage-at-path lib/returned-columns query path first-stage))
+          second-stage                 (new-second-stage stage first-stage-returned-columns)]
       [first-stage second-stage])))
 
 (mu/defn nest-expressions :- ::lib.schema/query

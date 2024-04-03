@@ -652,46 +652,35 @@
 
 (deftest ^:parallel uniquify-aliases-test
   (driver/with-driver :h2
-    (mt/dataset test-data
-      (qp.store/with-metadata-provider meta/metadata-provider
-        (is (partial= (lib.tu.macros/$ids products
-                        {:source-query       {:source-table $$products
-                                              :expressions  {"CATEGORY" [:concat
-                                                                         [:field %category {::add/source-table  $$products
-                                                                                            ::add/source-alias  "CATEGORY"
-                                                                                            ::add/desired-alias "CATEGORY"
-                                                                                            ::add/position      0}]
-                                                                         "2"]}
-                                              :fields       [[:field %category {::add/source-table  $$products
-                                                                                ::add/source-alias  "CATEGORY"
-                                                                                ::add/desired-alias "CATEGORY"
-                                                                                ::add/position      0}]
-                                                             [:expression "CATEGORY" {::add/desired-alias "CATEGORY_2"
-                                                                                      ::add/position      1}]]}
-                         :breakout           [[:field "CATEGORY_2" {:base-type          :type/Text
-                                                                    ::add/source-table  ::add/source
-                                                                    ::add/source-alias  "CATEGORY_2"
-                                                                    ::add/desired-alias "CATEGORY"
-                                                                    ::add/position      0}]]
-                         :aggregation        [[:aggregation-options [:count] {:name               "count"
-                                                                              ::add/desired-alias "count"
-                                                                              ::add/position      1}]]
-                         :order-by           [[:asc [:field "CATEGORY_2" {:base-type          :type/Text
-                                                                          ::add/source-table  ::add/source
-                                                                          ::add/source-alias  "CATEGORY_2"
-                                                                          ::add/desired-alias "CATEGORY"
-                                                                          ::add/position      0}]]]
-                         :limit              1})
-                      (-> (lib.tu.macros/mbql-query products
-                            {:expressions {"CATEGORY" [:concat $category "2"]}
-                             :breakout    [:expression"CATEGORY"]
-                             :aggregation [[:count]]
-                             :order-by    [[:asc [:expression"CATEGORY"]]]
-                             :limit       1})
-                          qp.preprocess/preprocess
-                          add/add-alias-info
-                          :query
-                          nest-query/nest-expressions)))))))
+    (qp.store/with-metadata-provider meta/metadata-provider
+      (is (=? (lib.tu.macros/$ids products
+                {:source-query {:source-table $$products
+                                :expressions  {"CATEGORY" [:concat
+                                                           [:field %category {::add/source-table $$products
+                                                                              ::add/source-alias "CATEGORY"}]
+                                                           "2"]}
+                                :fields       [[:expression "CATEGORY" {::add/desired-alias "CATEGORY"}]]}
+                 :breakout     [[:field "CATEGORY" {:base-type          :type/Text
+                                                    ::add/source-table  ::add/source
+                                                    ::add/source-alias  "CATEGORY"
+                                                    ::add/desired-alias "CATEGORY"}]]
+                 :aggregation  [[:aggregation-options [:count] {:name               "count"
+                                                                ::add/desired-alias "count"}]]
+                 :order-by     [[:asc [:field "CATEGORY" {:base-type          :type/Text
+                                                          ::add/source-table  ::add/source
+                                                          ::add/source-alias  "CATEGORY"
+                                                          ::add/desired-alias "CATEGORY"}]]]
+                 :limit        1})
+              (-> (lib.tu.macros/mbql-query products
+                    {:expressions {"CATEGORY" [:concat $category "2"]}
+                     :breakout    [:expression "CATEGORY"]
+                     :aggregation [[:count]]
+                     :order-by    [[:asc [:expression "CATEGORY"]]]
+                     :limit       1})
+                  qp.preprocess/preprocess
+                  add/add-alias-info
+                  :query
+                  nest-query/nest-expressions))))))
 
 (deftest ^:parallel uniquify-aliases-test-2
   (driver/with-driver :h2
@@ -701,18 +690,21 @@
                   {:source-query {:source-query {:expressions  {"DISCOUNT" [:coalesce [:field %discount {}] 0]}
                                                  :fields       [[:field %id {::add/desired-alias "ID"}]
                                                                 [:field %subtotal {::add/desired-alias "SUBTOTAL"}]
+                                                                ;; Exported as DISCOUNT_2 from this inner query.
                                                                 [:expression "DISCOUNT" {::add/desired-alias "DISCOUNT"}]]
                                                  :source-table $$orders}
                                   :fields       [[:field "ID"         {}]
                                                  [:field "SUBTOTAL"   {}]
-                                                 [:field "DISCOUNT" {:base-type          :type/Float
+                                                 ;; Then exported as DISCOUNT from the middle layer.
+                                                 [:field "DISCOUNT" {:base-type :type/Float
                                                                      ::add/source-alias  "DISCOUNT"
                                                                      ::add/desired-alias "DISCOUNT"}]]}
-                   :fields       [[:field "ID"       {}]
-                                  [:field "SUBTOTAL" {}]
-                                  [:field "DISCOUNT" {:base-type          :type/Float
-                                                      ::add/source-alias  "DISCOUNT"
-                                                      ::add/desired-alias "DISCOUNT"}]]})
+                   :source-query/model? true
+                   :fields              [[:field %id        {}]
+                                         [:field %subtotal  {}]
+                                         [:field "DISCOUNT" {:base-type :type/Float
+                                                             ::add/source-alias "DISCOUNT"
+                                                             ::add/desired-alias "DISCOUNT"}]]})
                 (-> (lib.tu.macros/$ids orders
                       {:type     :query
                        :database (meta/id)
@@ -721,9 +713,11 @@
                                                                 $subtotal
                                                                 [:expression "DISCOUNT"]]
                                                  :source-table $$orders}
-                                  :fields       [[:field "ID"       {:base-type :type/Integer}]
-                                                 [:field "SUBTOTAL" {:base-type :type/Float}]
-                                                 [:field "DISCOUNT" {:base-type :type/Float}]]}})
+                                  :source-query/model? true
+                                  ;; uh, DISCOUNT is wrong here, since the column name is supposed to be DISCOUNT_2...
+                                  :fields              [[:field "ID"       {:base-type :type/Integer}]
+                                                        [:field "SUBTOTAL" {:base-type :type/Float}]
+                                                        [:field "DISCOUNT" {:base-type :type/Float}]]}})
                     qp.preprocess/preprocess
                     add/add-alias-info
                     :query
