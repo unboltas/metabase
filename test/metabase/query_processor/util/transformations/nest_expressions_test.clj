@@ -2,6 +2,7 @@
   "Additional tests are in [[metabase.query-processor.util.nest-query-test]]."
   (:require
    [clojure.test :refer :all]
+   [metabase.lib.core :as lib]
    [metabase.lib.query :as lib.query]
    [metabase.lib.test-metadata :as meta]
    [metabase.lib.test-util.macros :as lib.tu.macros]
@@ -46,3 +47,49 @@
                                   [:asc {} [:field {} "CREATED_AT"]]
                                   [:asc {} [:field {} "pivot-grouping"]]]}]}
             (nest-expressions/nest-expressions query)))))
+
+(deftest ^:parallel nested-expressions-with-existing-names-test
+  (testing "Expressions with the same name as existing columns should work correctly in nested queries (#21131)"
+    (let [query (lib.query/query
+                 meta/metadata-provider
+                 (lib.tu.macros/mbql-query products
+                   {:source-query {:source-table $$products
+                                   :expressions  {"PRICE" [:+ $price 2]}
+                                   :fields       [$id $price [:expression "PRICE"]]
+                                   :order-by     [[:asc $id]]
+                                   :limit        2}}))]
+      (is (=? {:stages [{:expressions [[:+
+                                        {:lib/expression-name "PRICE"}
+                                        [:field {} (meta/id :products :price)]
+                                        2]]
+                         :fields [[:field {} (meta/id :products :id)]
+                                  [:field {} (meta/id :products :price)]
+                                  [:expression {} "PRICE"]]}
+                        {:lib/type :mbql.stage/mbql
+                         :fields [[:field {} "ID"]
+                                  [:field {} "PRICE"]
+                                  [:field {} "PRICE_2"]]
+                         :order-by [[:asc {} [:field {} "ID"]]]
+                         :limit 2}
+                        {:lib/type :mbql.stage/mbql}]}
+              (nest-expressions/nest-expressions query))))))
+
+(deftest ^:parallel nested-expressions-with-existing-names-test-2
+  (testing "Expressions with the same name as existing columns but different case should work as well (#21131)"
+    (let [query (lib.tu.macros/mbql-query products
+                  {:source-query {:source-table $$products
+                                  :expressions  {"price" [:+ $price 2]}
+                                  :fields       [$id $price [:expression "price"]]}})
+          query (lib/query meta/metadata-provider query)]
+      (is (=? {:stages [{:expressions [[:+
+                                        {:lib/expression-name "price"}
+                                        [:field {} 17503]
+                                        2]]
+                         :fields [[:field {} (meta/id :products :id)]
+                                  [:field {} (meta/id :products :price)]
+                                  [:expression {} "price"]]}
+                        {:fields [[:field {} "ID"]
+                                  [:field {} "PRICE"]
+                                  [:field {} "price_2"]]}
+                        {:lib/type :mbql.stage/mbql}]}
+              (nest-expressions/nest-expressions query))))))
