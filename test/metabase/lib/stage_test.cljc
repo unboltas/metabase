@@ -86,7 +86,7 @@
     (testing "Dropping with 1 stage should no-op"
       (is (= query (lib/drop-stage query))))))
 
-(deftest ^:paralell add-stage-at-index-test
+(deftest ^:parallel add-stage-at-index-test
   (let [query {:lib/type :mbql/query
                :database 1
                :stages   [{:lib/type :mbql.stage/mbql, :source-table 1, ::stage 0}

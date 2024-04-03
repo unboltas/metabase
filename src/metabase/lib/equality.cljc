@@ -16,6 +16,7 @@
    [metabase.lib.schema.ref :as lib.schema.ref]
    [metabase.lib.temporal-bucket :as lib.temporal-bucket]
    [metabase.lib.util :as lib.util]
+   [metabase.util :as u]
    [metabase.util.malli :as mu]
    #?@(:clj ([metabase.util.log :as log]))))
 
@@ -235,12 +236,13 @@
         (if-not (next matches)
           (first matches)
           (#?(:cljs js/console.warn :clj log/warn)
-           "Multiple plausible matches with the same :join-alias - more disambiguation needed"
-           {:ref     a-ref
-            :matches matches})
+           "Multiple plausible matches with the same :join-alias - more disambiguation needed\n"
+           (u/pprint-to-str
+            {:ref     a-ref
+             :matches matches}))
           #_(throw (ex-info "Multiple plausible matches with the same :join-alias - more disambiguation needed"
-                          {:ref     a-ref
-                           :matches matches}))))
+                            {:ref     a-ref
+                             :matches matches}))))
       (disambiguate-matches-no-alias a-ref columns))))
 
 (def ^:private FindMatchingColumnOptions

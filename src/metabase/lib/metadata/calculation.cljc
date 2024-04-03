@@ -521,6 +521,11 @@
   [query stage-number x options]
   (returned-columns-method query stage-number x options))
 
+;;; assume (visible-columns query stage-number) means get the visible columns for that query stage.
+(defmethod visible-columns-method :dispatch-type/integer
+  [query _stage-number stage-number options]
+  (visible-columns-method query stage-number (lib.util/query-stage query stage-number) options))
+
 (mu/defn visible-columns :- ColumnsWithUniqueAliases
   "Return a sequence of columns that should be visible *within* a given stage of something, e.g. a query stage or a
   join query. This includes not just the columns that get returned (ones present in [[metadata]], but other columns
