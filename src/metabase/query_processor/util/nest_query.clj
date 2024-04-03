@@ -11,7 +11,6 @@
    [metabase.lib.metadata :as lib.metadata]
    [metabase.lib.query :as lib.query]
    [metabase.query-processor.store :as qp.store]
-   [metabase.query-processor.util.add-alias-info :as add]
    [metabase.query-processor.util.transformations.nest-expressions :as transformations.nest-expressions]
    [metabase.util :as u]
    [metabase.util.malli :as mu]))
@@ -27,5 +26,4 @@
                     inner-query)]
     (-> (transformations.nest-expressions/nest-expressions mlv2-query)
         lib.convert/->legacy-MBQL
-        :query
-        add/add-alias-info)))
+        :query)))

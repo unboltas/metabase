@@ -32,6 +32,7 @@
                               (lib/aggregate (lib/cum-sum orders-total))
                               ;; 4. sum of order total
                               (lib/aggregate (lib/sum orders-total)))
+        ;; preserve original UUIDs so stuff referring to them still works correctly.
         original-uuids  (mapv lib.options/uuid (lib/aggregations query))]
     (is (every? string? original-uuids))
     (is (=? {:lib/type :mbql/query
@@ -41,18 +42,18 @@
                          :aggregation  [[:count {:lib/uuid (nth original-uuids 0)}]
                                         [:sum {:lib/uuid (nth original-uuids 1)}
                                          [:field {} (meta/id :orders :total)]]
-                                        [:sum {:lib/uuid (nth original-uuids 1)}
+                                        [:sum {:lib/uuid (nth original-uuids 2)}
                                          [:field {} (meta/id :orders :total)]]]}
                         ;; add a new stage to do cumulative sum of the non-cumulative aggregations.
                         {:breakout [[:field
-                                     {:temporal-unit (symbol "nil #_\"key is not present.\"")
+                                     {:temporal-unit :default
                                       :name          "CREATED_AT"}
                                      "CREATED_AT"]
                                     [:field {:name "__cumulative_count"} "count"]
                                     [:field {:name "__cumulative_sum"} "sum"]
                                     [:field {:name "sum_2"} "sum_2"]]
                          :order-by [[:asc {} [:field
-                                              {:temporal-unit (symbol "nil #_\"key is not present.\"")}
+                                              {:temporal-unit :default}
                                               "CREATED_AT"]]
                                     [:asc {} [:field {} "count"]]
                                     [:asc {} [:field {} "sum"]]
@@ -61,7 +62,7 @@
                                        [:cum-sum {:name "sum"} [:field {} "sum"]]]}
                         ;; add a second new stage to restore the original column order
                         {:fields [[:field
-                                   {:temporal-unit (symbol "nil #_\"key is not present.\"")}
+                                   {:temporal-unit :default}
                                    "CREATED_AT"]
                                   [:field {} "count"]
                                   [:field {} "sum"]

@@ -68,8 +68,8 @@
                            :aggregation [[:count]]
                            :fields      [[:expression "double_price"]]})
                         qp.preprocess/preprocess
-                        add/add-alias-info
-                        nest-expressions))))))
+                        nest-expressions
+                        add/add-alias-info))))))
 
 (deftest ^:parallel nest-expressions-test-2
   (driver/with-driver :h2
@@ -106,7 +106,6 @@
                                 [:field "expression" {}]]}
                 (-> query
                     qp.preprocess/preprocess
-                    add/add-alias-info
                     :query
                     nest-query/nest-expressions)))))))
 
@@ -144,8 +143,8 @@
                                      !month.date]
                        :limit       1})
                     qp.preprocess/preprocess
-                    add/add-alias-info
-                    nest-expressions)))))))
+                    nest-expressions
+                    add/add-alias-info)))))))
 
 (deftest ^:parallel multiple-expressions-test
   (testing "Make sure the nested version of the query doesn't mix up expressions if we have ones that reference others"
@@ -180,8 +179,8 @@
                        :fields      [[:expression "my_cool_new_field"]]
                        :order-by    [[:asc $id]]
                        :limit       3})
-                    add/add-alias-info
-                    nest-expressions)))))))
+                    nest-expressions
+                    add/add-alias-info)))))))
 
 (deftest ^:parallel nest-expressions-ignore-source-queries-test
   (testing (str "When 'raising' :expression clauses, only raise ones in the current level. Handle duplicate expression "
@@ -228,7 +227,7 @@
                                              ::add/desired-alias "x"}]]
 
                        :limit 1})
-                    (-> query add/add-alias-info nest-expressions)))))))))
+                    (-> query nest-expressions add/add-alias-info)))))))))
 
 (deftest ^:parallel nest-expressions-ignore-source-queries-from-joins-e2e-test
   (testing "Ignores source-query from joins (#20809)"
@@ -323,8 +322,7 @@
                                                                         [:field "AvgPrice" {:base-type          :type/Integer
                                                                                             :join-alias         "CategoriesStats"
                                                                                             ::add/source-table  "CategoriesStats"
-                                                                                            ::add/source-alias  "AvgPrice"
-                                                                                            ::add/desired-alias "CategoriesStats__AvgPrice"}]]}
+                                                                                            ::add/source-alias  "AvgPrice"}]]}
                                         :fields       [[:field %id {::add/source-table  $$venues
                                                                     ::add/source-alias  "ID"
                                                                     ::add/desired-alias "ID"}]
@@ -425,8 +423,8 @@
                                             :fields       :all}]
                              :limit       3})
                           qp.preprocess/preprocess
-                          add/add-alias-info
-                          nest-expressions)))))))
+                          nest-expressions
+                          add/add-alias-info)))))))
 
 (deftest ^:parallel nest-expressions-eliminate-duplicate-coercion-test
   (testing "If coercion happens in the source query, don't do it a second time in the parent query (#12430)"
@@ -456,8 +454,8 @@
                              :fields      [$price
                                            [:expression "test"]]
                              :limit       1})
-                          add/add-alias-info
-                          nest-expressions)))))))
+                          nest-expressions
+                          add/add-alias-info)))))))
 
 (deftest ^:parallel multiple-joins-with-expressions-test
   (testing "We should be able to compile a complicated query with multiple joins and expressions correctly"
@@ -523,8 +521,8 @@
                                         :fk-field-id  %product-id
                                         :condition    [:= $product-id &PRODUCTS__via__PRODUCT_ID.products.id]}]})
                       qp.preprocess/preprocess
-                      add/add-alias-info
                       nest-expressions
+                      add/add-alias-info
                       :source-query))))))))
 
 (deftest ^:parallel uniquify-aliases-test
@@ -555,9 +553,9 @@
                      :order-by    [[:asc [:expression "CATEGORY"]]]
                      :limit       1})
                   qp.preprocess/preprocess
-                  add/add-alias-info
                   :query
-                  nest-query/nest-expressions))))))
+                  nest-query/nest-expressions
+                  add/add-alias-info))))))
 
 (deftest ^:parallel uniquify-aliases-test-2
   (driver/with-driver :h2
@@ -596,7 +594,7 @@
                                                         [:field "SUBTOTAL" {:base-type :type/Float}]
                                                         [:field "DISCOUNT" {:base-type :type/Float}]]}})
                     qp.preprocess/preprocess
-                    add/add-alias-info
                     :query
                     nest-query/nest-expressions
+                    add/add-alias-info
                     remove-source-metadata)))))))
