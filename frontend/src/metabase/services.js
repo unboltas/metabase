@@ -353,7 +353,6 @@ export const MetabaseApi = {
   dataset: POST("/api/dataset"),
   dataset_pivot: POST("/api/dataset/pivot"),
   dataset_duration: POST("/api/dataset/duration"),
-  native: POST("/api/dataset/native"),
 
   // to support audit app  allow the endpoint to be provided in the query
   datasetEndpoint: POST("/api/:endpoint", {
