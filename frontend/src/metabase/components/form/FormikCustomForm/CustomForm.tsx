@@ -28,12 +28,20 @@ interface FormRenderProps<Values extends BaseFieldValues>
   FormFooter: React.ComponentType<CustomFormFooterProps>;
 }
 
+type Children<Values> =
+  | React.ReactNode
+  | ((props: FormRenderProps<Values>) => JSX.Element);
+
 export interface CustomFormProps<Values extends BaseFieldValues>
   extends BaseFormProps<Values>,
     OptionalFormViewProps {
-  children?:
-    | React.ReactNode
-    | ((props: FormRenderProps<Values>) => JSX.Element);
+  children?: Children<Values>;
+}
+
+function isChildrenReactNode<Values = unknown>(
+  children: Children<Values>,
+): children is React.ReactNode {
+  return typeof children !== "function";
 }
 
 /**
@@ -43,7 +51,7 @@ function CustomForm<Values extends BaseFieldValues>(
   props: CustomFormProps<Values>,
 ) {
   const { formObject: form, values, children } = props;
-  if (typeof children === "function") {
+  if (!isChildrenReactNode(children)) {
     return (
       <FormContext.Provider value={props}>
         {children({
@@ -62,7 +70,7 @@ function CustomForm<Values extends BaseFieldValues>(
 
   return (
     <FormContext.Provider value={props}>
-      <Form {...props} />
+      <Form {...props}>{children} </Form>
     </FormContext.Provider>
   );
 }

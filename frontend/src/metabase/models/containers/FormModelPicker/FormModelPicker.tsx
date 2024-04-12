@@ -73,7 +73,7 @@ function FormModelPicker({
   );
 
   const renderContent = useCallback(
-    ({ closePopover }) => {
+    ({ closePopover }: { closePopover: () => void }) => {
       return (
         <PopoverItemPicker
           value={{ id: value, model: "dataset" }}

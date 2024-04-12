@@ -61,7 +61,7 @@ export const SMTPConnectionForm = ({
   }, [dispatch]);
 
   const handleUpdateEmailSettings = useCallback(
-    async formData => {
+    async (formData: object) => {
       await dispatch(updateEmailSettings(formData));
 
       if (!isEmailConfigured) {
