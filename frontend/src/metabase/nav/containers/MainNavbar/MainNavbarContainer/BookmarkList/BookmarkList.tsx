@@ -128,7 +128,7 @@ const BookmarkList = ({
     activationConstraint: { distance: 15 },
   });
 
-  const onToggleBookmarks = useCallback(isVisible => {
+  const onToggleBookmarks = useCallback((isVisible: boolean) => {
     localStorage.setItem("shouldDisplayBookmarks", String(isVisible));
   }, []);
 
