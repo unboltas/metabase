@@ -96,11 +96,14 @@ describe("MetricApp", () => {
 
     history.push(FORM_URL);
 
-    await userEvent.type(screen.getByLabelText("Name Your Metric"), "Name");
+    await userEvent.type(
+      await screen.findByLabelText("Name Your Metric"),
+      "Name",
+    );
 
     history.goBack();
 
-    expect(screen.getByTestId("leave-confirmation")).toBeInTheDocument();
+    expect(await screen.findByTestId("leave-confirmation")).toBeInTheDocument();
   });
 
   it("does not show custom warning modal when saving changes", async () => {
@@ -110,7 +113,7 @@ describe("MetricApp", () => {
 
     await waitForLoaderToBeRemoved();
 
-    await userEvent.click(screen.getByText("Orders"));
+    await userEvent.click(await screen.findByText("Orders"));
 
     await waitForLoaderToBeRemoved();
 

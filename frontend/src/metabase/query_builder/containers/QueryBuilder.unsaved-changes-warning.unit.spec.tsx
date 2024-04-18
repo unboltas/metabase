@@ -6,6 +6,7 @@ import {
   setupCardQueryMetadataEndpoint,
 } from "__support__/server-mocks";
 import {
+  act,
   screen,
   waitFor,
   waitForLoaderToBeRemoved,
@@ -52,7 +53,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
 
       await startNewNotebookModel();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(screen.getByTestId("leave-confirmation")).toBeInTheDocument();
     });
@@ -107,7 +110,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
 
       await triggerNativeQueryChange();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(screen.getByTestId("leave-confirmation")).toBeInTheDocument();
     });
@@ -139,7 +144,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
           screen.queryByTestId("leave-confirmation"),
         ).not.toBeInTheDocument();
 
-        history.push("/redirect");
+        act(() => {
+          history.push("/redirect");
+        });
 
         expect(
           screen.queryByTestId("leave-confirmation"),
@@ -157,7 +164,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         await triggerNotebookQueryChange();
         await waitForSaveChangesToBeEnabled();
 
-        history.push("/redirect");
+        act(() => {
+          history.push("/redirect");
+        });
 
         expect(screen.getByTestId("leave-confirmation")).toBeInTheDocument();
       });
@@ -174,7 +183,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         await revertNotebookQueryChange();
         await waitForSaveChangesToBeDisabled();
 
-        history.push("/redirect");
+        act(() => {
+          history.push("/redirect");
+        });
 
         expect(
           screen.queryByTestId("leave-confirmation"),
@@ -237,7 +248,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
           screen.queryByTestId("leave-confirmation"),
         ).not.toBeInTheDocument();
 
-        history.push("/redirect");
+        act(() => {
+          history.push("/redirect");
+        });
 
         expect(
           screen.queryByTestId("leave-confirmation"),
@@ -256,7 +269,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         await triggerMetadataChange();
         await waitForSaveChangesToBeEnabled();
 
-        history.push("/redirect");
+        act(() => {
+          history.push("/redirect");
+        });
 
         expect(screen.getByTestId("leave-confirmation")).toBeInTheDocument();
       });
@@ -268,7 +283,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
           initialRoute: `/model/${TEST_MODEL_CARD.id}/metadata`,
         });
 
-        history.push("/redirect");
+        act(() => {
+          history.push("/redirect");
+        });
 
         expect(
           screen.queryByTestId("leave-confirmation"),
@@ -337,7 +354,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
           screen.queryByTestId("leave-confirmation"),
         ).not.toBeInTheDocument();
 
-        history.push("/redirect");
+        act(() => {
+          history.push("/redirect");
+        });
 
         expect(
           screen.queryByTestId("leave-confirmation"),
@@ -411,7 +430,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
       await triggerNativeQueryChange();
       await waitForSaveToBeEnabled();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(screen.getByTestId("leave-confirmation")).toBeInTheDocument();
     });
@@ -428,7 +449,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
       );
       await waitForLoaderToBeRemoved();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -497,7 +520,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         screen.queryByTestId("leave-confirmation"),
       ).not.toBeInTheDocument();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -515,7 +540,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
       await triggerNativeQueryChange();
       await waitForSaveToBeEnabled();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(screen.getByTestId("leave-confirmation")).toBeInTheDocument();
     });
@@ -532,7 +559,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
       await userEvent.click(screen.getByTestId("Detail-button"));
       await waitForSaveToBeEnabled();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -547,7 +576,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
 
       await waitForNativeQueryEditorReady();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -599,7 +630,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         screen.queryByTestId("leave-confirmation"),
       ).not.toBeInTheDocument();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -640,7 +673,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         screen.queryByTestId("leave-confirmation"),
       ).not.toBeInTheDocument();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -657,8 +692,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
 
       await triggerNotebookQueryChange();
       await waitForSaveToBeEnabled();
-
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(screen.getByTestId("leave-confirmation")).toBeInTheDocument();
     });
@@ -672,7 +708,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
       await triggerVisualizationQueryChange();
       await waitForSaveToBeEnabled();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -685,7 +723,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         initialRoute: `/question/${TEST_STRUCTURED_CARD.id}/notebook`,
       });
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -740,7 +780,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         screen.queryByTestId("leave-confirmation"),
       ).not.toBeInTheDocument();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),
@@ -781,7 +823,9 @@ describe("QueryBuilder - unsaved changes warning", () => {
         screen.queryByTestId("leave-confirmation"),
       ).not.toBeInTheDocument();
 
-      history.push("/redirect");
+      act(() => {
+        history.push("/redirect");
+      });
 
       expect(
         screen.queryByTestId("leave-confirmation"),

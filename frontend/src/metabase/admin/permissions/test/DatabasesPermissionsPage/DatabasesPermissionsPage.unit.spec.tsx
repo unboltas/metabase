@@ -62,7 +62,9 @@ const setup = async () => {
 };
 
 const editDatabasePermission = async () => {
-  const permissionsSelectElem = screen.getAllByTestId("permissions-select")[0];
+  const permissionsSelectElem = (
+    await screen.findAllByTestId("permissions-select")
+  )[0];
   fireEvent.click(permissionsSelectElem);
 
   const clickElement = screen.getByLabelText("eye icon");

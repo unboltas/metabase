@@ -464,12 +464,12 @@ describe("ObjectDetailView", () => {
 
     const action = await findActionInActionMenu(implicitUpdateAction);
     expect(action).toBeInTheDocument();
-    action?.click();
+    await userEvent.click(action);
 
     expect(
       screen.queryByText("Choose a record to update"),
     ).not.toBeInTheDocument();
-    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
+    expect(await screen.findByTestId("loading-spinner")).toBeInTheDocument();
 
     await waitForLoaderToBeRemoved();
 
@@ -505,7 +505,7 @@ async function findActionInActionMenu({ name }: Pick<WritebackAction, "name">) {
   const actionsMenu = await screen.findByTestId("actions-menu");
   await userEvent.click(actionsMenu);
   const popover = await screen.findByRole("dialog");
-  const action = within(popover).queryByText(name);
+  const action = within(popover).findByText(name);
   return action;
 }
 

@@ -1,3 +1,5 @@
+import userEvent from "@testing-library/user-event";
+
 import { act, screen } from "__support__/ui";
 
 import { changeInput, getSaveButton, setup } from "./test-utils";
@@ -12,7 +14,8 @@ describe("StrategyEditorForDatabases", () => {
     const ttlStrategyRadioButton = await screen.findByRole("radio", {
       name: /TTL/i,
     });
-    ttlStrategyRadioButton.click();
+
+    await userEvent.click(ttlStrategyRadioButton);
 
     expect((await screen.findAllByRole("spinbutton")).length).toBe(2);
 
@@ -23,32 +26,32 @@ describe("StrategyEditorForDatabases", () => {
       await changeInput(/multiplier/i, 10, 3);
     });
 
-    (await screen.findByTestId("strategy-form-submit-button")).click();
+    await userEvent.click(
+      await screen.findByTestId("strategy-form-submit-button"),
+    );
 
     // NOTE: There is no need to check that the submission of the form was successful.
     // It doesn't meaningfully change the state of the component on OSS
 
-    await act(async () => {
-      const durationStrategyRadioButton = await screen.findByRole("radio", {
-        name: /duration/i,
-      });
-      durationStrategyRadioButton.click();
-
-      expect((await screen.findAllByRole("spinbutton")).length).toBe(1);
-
-      await changeInput(/Cache results for this many hours/, 24, 48);
+    const durationStrategyRadioButton = await screen.findByRole("radio", {
+      name: /duration/i,
     });
+    await userEvent.click(durationStrategyRadioButton);
 
-    (await screen.findByTestId("strategy-form-submit-button")).click();
+    expect((await screen.findAllByRole("spinbutton")).length).toBe(1);
 
-    await act(async () => {
-      const noCacheStrategyRadioButton = await screen.findByRole("radio", {
-        name: /Don.t cache/i,
-      });
-      noCacheStrategyRadioButton.click();
+    await changeInput(/Cache results for this many hours/, 24, 48);
 
-      expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+    await userEvent.click(
+      await screen.findByTestId("strategy-form-submit-button"),
+    );
+
+    const noCacheStrategyRadioButton = await screen.findByRole("radio", {
+      name: /Don.t cache/i,
     });
+    await userEvent.click(noCacheStrategyRadioButton);
+
+    expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
 
     (await screen.findByTestId("strategy-form-submit-button")).click();
   });

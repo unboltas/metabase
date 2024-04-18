@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import fetchMock from "fetch-mock";
 import { Route } from "react-router";
 
@@ -10,7 +11,6 @@ import {
 import {
   renderWithProviders,
   screen,
-  fireEvent,
   waitForLoaderToBeRemoved,
 } from "__support__/ui";
 import DataPermissionsPage from "metabase/admin/permissions/pages/DataPermissionsPage/DataPermissionsPage";
@@ -63,11 +63,13 @@ const setup = async ({
 };
 
 const editDatabasePermission = async () => {
-  const permissionsSelectElem = screen.getAllByTestId("permissions-select")[0];
-  fireEvent.click(permissionsSelectElem);
+  const permissionsSelectElem = (
+    await screen.findAllByTestId("permissions-select")
+  )[0];
+  await userEvent.click(permissionsSelectElem);
 
-  const clickElement = screen.getByLabelText("eye icon");
-  fireEvent.click(clickElement);
+  const clickElement = await screen.findByLabelText("eye icon");
+  await userEvent.click(clickElement);
 
   await delay(0);
 };
