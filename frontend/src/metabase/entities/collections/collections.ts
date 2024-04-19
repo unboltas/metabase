@@ -61,8 +61,6 @@ const Collections = createEntity({
         { parent_id: canonicalCollectionId(collection?.id) },
         undo(opts, "collection", "moved"),
       ),
-
-    delete: null,
   },
 
   objectSelectors: {
