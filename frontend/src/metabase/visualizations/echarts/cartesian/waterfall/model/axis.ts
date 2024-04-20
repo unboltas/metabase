@@ -54,7 +54,7 @@ export const getWaterfallXAxisModel = (
   if (isTimeSeriesAxis(xAxisModel)) {
     const totalXValue = getTotalTimeSeriesXValue(xAxisModel);
     const range: DateRange = [xAxisModel.range[0], dayjs(totalXValue)];
-    const intervalsCount = xAxisModel.intervalsCount;
+    const intervalsCount = xAxisModel.intervalsCount + 1;
     const formatter = (valueRaw: RowValue) => {
       const dateValue = tryGetDate(valueRaw);
       if (dateValue == null) {
@@ -80,6 +80,8 @@ export const getWaterfallXAxisModel = (
   if (isNumericAxis(xAxisModel)) {
     const totalXValue = xAxisModel.extent[1] + xAxisModel.interval;
     const extent: Extent = [xAxisModel.extent[0], totalXValue];
+    const intervalsCount = xAxisModel.intervalsCount + 1;
+
     const formatter = (valueRaw: RowValue) => {
       if (valueRaw === totalXValue) {
         return t`Total`;
@@ -91,6 +93,7 @@ export const getWaterfallXAxisModel = (
     return {
       ...xAxisModel,
       totalXValue,
+      intervalsCount,
       extent,
       formatter,
     };
