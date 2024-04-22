@@ -5,7 +5,11 @@ import { t } from "ttag";
 import ErrorBoundary from "metabase/ErrorBoundary";
 import { useModalOpen } from "metabase/hooks/use-modal-open";
 import { Modal } from "metabase/ui";
-import type { SearchModel, SearchResultId } from "metabase-types/api";
+import type {
+  SearchModel,
+  SearchResultId,
+  SearchRequest,
+} from "metabase-types/api";
 
 import type {
   EntityPickerOptions,
@@ -48,6 +52,7 @@ export interface EntityPickerModalProps<Model extends string, Item> {
   tabs: EntityTab<Model>[];
   options?: Partial<EntityPickerOptions>;
   searchResultFilter?: (results: Item[]) => Item[];
+  searchParams?: Partial<SearchRequest>;
   actionButtons?: JSX.Element[];
   trapFocus?: boolean;
 }
@@ -69,6 +74,7 @@ export function EntityPickerModal<
   actionButtons = [],
   searchResultFilter,
   trapFocus = true,
+  searchParams,
 }: EntityPickerModalProps<Model, Item>) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Item[] | null>(null);
@@ -120,6 +126,7 @@ export function EntityPickerModal<
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 searchFilter={searchResultFilter}
+                searchParams={searchParams}
               />
             )}
           </GrowFlex>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useMount, usePrevious } from "react-use";
 
 import { Icon, Tabs } from "metabase/ui";
+import type { SearchRequest } from "metabase-types/api";
 
 import type { EntityTab, TypeWithModel } from "../../types";
 import {
@@ -27,6 +28,7 @@ export const TabsView = <
   searchResults: Item[] | null;
   selectedItem: Item | null;
   initialValue?: Partial<Item>;
+  searchParams?: Partial<SearchRequest>;
 }) => {
   const hasSearchTab = !!searchQuery;
   const previousSearchQuery = usePrevious(searchQuery);
