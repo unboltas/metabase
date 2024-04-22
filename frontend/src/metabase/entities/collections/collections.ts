@@ -48,7 +48,7 @@ const Collections = createEntity({
       Collections.actions.update(
         { id },
         { archived },
-        undo(opts, "collection", archived ? "archived" : "unarchived"),
+        undo(opts, "collection", archived ? "trashed" : "restored"),
       ),
 
     setCollection: (
