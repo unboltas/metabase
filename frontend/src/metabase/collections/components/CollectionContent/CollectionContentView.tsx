@@ -25,6 +25,7 @@ import {
 import PaginationControls from "metabase/components/PaginationControls";
 import ItemsDragLayer from "metabase/containers/dnd/ItemsDragLayer";
 import CS from "metabase/css/core/index.css";
+import Collections from "metabase/entities/collections";
 import Search from "metabase/entities/search";
 import { useListSelect } from "metabase/hooks/use-list-select";
 import { usePagination } from "metabase/hooks/use-pagination";
@@ -295,7 +296,17 @@ export const CollectionContentView = ({
             {collection.archived && (
               <ArchivedEntityBanner
                 entity="collection"
-                entityId={collection.id}
+                onUnarchive={() => {
+                  dispatch(
+                    Collections.actions.setArchived(
+                      { id: collectionId },
+                      false,
+                    ),
+                  );
+                }}
+                onDeletePermanently={() =>
+                  dispatch(Collections.actions.delete({ id: collectionId }))
+                }
               />
             )}
 
