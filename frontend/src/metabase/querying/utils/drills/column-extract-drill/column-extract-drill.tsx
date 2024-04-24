@@ -1,3 +1,4 @@
+import * as MetabaseAnalytics from "metabase/lib/analytics";
 import { ClickActionsView } from "metabase/visualizations/components/ClickActions";
 import type {
   ClickActionPopoverProps,
@@ -24,7 +25,15 @@ export const columnExtractDrill: Drill<Lib.ColumnExtractDrillThruInfo> = ({
       }),
     );
 
-    return <ClickActionsView clickActions={actions} onClick={onClick} />;
+    function handleClick(action: RegularClickAction) {
+      MetabaseAnalytics.trackStructEvent(
+        "Actions",
+        "column_extract_via_column_header",
+      );
+      onClick(action);
+    }
+
+    return <ClickActionsView clickActions={actions} onClick={handleClick} />;
   };
 
   return [
