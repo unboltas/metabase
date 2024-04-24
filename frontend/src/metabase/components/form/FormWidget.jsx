@@ -5,7 +5,6 @@ import { PLUGIN_FORM_WIDGETS } from "metabase/plugins";
 
 import FormBooleanWidget from "./widgets/FormBooleanWidget";
 import FormCheckBoxWidget from "./widgets/FormCheckBoxWidget";
-import FormCollectionWidget from "./widgets/FormCollectionWidget";
 import FormColorWidget from "./widgets/FormColorWidget";
 import FormEmailWidget from "./widgets/FormEmailWidget";
 import FormHiddenWidget from "./widgets/FormHiddenWidget";
@@ -16,7 +15,6 @@ import FormPasswordWidget from "./widgets/FormPasswordWidget";
 import FormRadioWidget from "./widgets/FormRadioWidget";
 import FormSectionWidget from "./widgets/FormSectionWidget";
 import FormSelectWidget from "./widgets/FormSelectWidget";
-import FormSnippetCollectionWidget from "./widgets/FormSnippetCollectionWidget";
 import FormTextAreaWidget from "./widgets/FormTextAreaWidget";
 import FormTextFileWidget from "./widgets/FormTextFileWidget";
 
@@ -33,8 +31,6 @@ const WIDGETS = {
   select: FormSelectWidget,
   integer: FormNumericInputWidget,
   boolean: FormBooleanWidget,
-  collection: FormCollectionWidget,
-  snippetCollection: FormSnippetCollectionWidget,
   hidden: FormHiddenWidget,
   textFile: FormTextFileWidget,
 };
