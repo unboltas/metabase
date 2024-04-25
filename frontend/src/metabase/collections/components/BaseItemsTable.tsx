@@ -1,6 +1,7 @@
 import type { HTMLAttributes, PropsWithChildren } from "react";
 import { t } from "ttag";
 
+import { isTrashedCollection } from "metabase/collections/utils";
 import CheckBox from "metabase/core/components/CheckBox";
 import type Database from "metabase-lib/v1/metadata/Database";
 import type { Bookmark, Collection, CollectionItem } from "metabase-types/api";
@@ -203,14 +204,18 @@ const BaseItemsTable = ({
               sortingOptions={sortingOptions}
               onSortingOptionsChange={onSortingOptionsChange}
             >
-              {collection?.archived ? t`Deleted by` : t`Last edited by`}
+              {isTrashedCollection(collection)
+                ? t`Deleted by`
+                : t`Last edited by`}
             </SortableColumnHeader>
             <SortableColumnHeader
               name="last_edited_at"
               sortingOptions={sortingOptions}
               onSortingOptionsChange={onSortingOptionsChange}
             >
-              {collection?.archived ? t`Deleted at` : t`Last edited at`}
+              {isTrashedCollection(collection)
+                ? t`Deleted at`
+                : t`Last edited at`}
             </SortableColumnHeader>
             <th></th>
           </tr>
