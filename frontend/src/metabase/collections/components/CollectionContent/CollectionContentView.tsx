@@ -8,7 +8,6 @@ import { t } from "ttag";
 
 import ErrorBoundary from "metabase/ErrorBoundary";
 import BulkActions from "metabase/collections/components/BulkActions";
-import { ArchivedEntityBanner } from "metabase/collections/components/CollectionArchiveBanner";
 import CollectionEmptyState from "metabase/collections/components/CollectionEmptyState";
 import ItemsTable from "metabase/collections/components/ItemsTable";
 import PinnedItemOverview from "metabase/collections/components/PinnedItemOverview";
@@ -23,6 +22,7 @@ import {
   isRootTrashCollection,
   isPersonalCollectionChild,
 } from "metabase/collections/utils";
+import { ArchivedEntityBanner } from "metabase/components/ArchivedEntityBanner";
 import PaginationControls from "metabase/components/PaginationControls";
 import ItemsDragLayer from "metabase/containers/dnd/ItemsDragLayer";
 import CS from "metabase/css/core/index.css";
