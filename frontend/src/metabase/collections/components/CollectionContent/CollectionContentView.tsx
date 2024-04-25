@@ -265,6 +265,7 @@ export const CollectionContentView = ({
             {collection.archived && (
               <ArchivedEntityBanner
                 entity="collection"
+                canWrite={collection.can_write}
                 onUnarchive={() => {
                   dispatch(
                     Collections.actions.setArchived(
@@ -320,7 +321,7 @@ export const CollectionContentView = ({
                   wrapped
                 >
                   {({
-                    list: unpinnedItems = [],
+                    list = [],
                     metadata = {},
                     loading: loadingUnpinnedItems,
                   }: {
@@ -328,6 +329,9 @@ export const CollectionContentView = ({
                     metadata: { total?: number };
                     loading: boolean;
                   }) => {
+                    const unpinnedItems = list.filter(
+                      item => item.id !== TRASH_COLLECTION.id,
+                    );
                     const hasPagination: boolean =
                       !!metadata.total && metadata.total > PAGE_SIZE;
 
