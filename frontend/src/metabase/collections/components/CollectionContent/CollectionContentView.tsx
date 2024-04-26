@@ -27,7 +27,6 @@ import PaginationControls from "metabase/components/PaginationControls";
 import ItemsDragLayer from "metabase/containers/dnd/ItemsDragLayer";
 import CS from "metabase/css/core/index.css";
 import Collections from "metabase/entities/collections";
-import { TRASH_COLLECTION } from "metabase/entities/collections/constants";
 import Search from "metabase/entities/search";
 import { useListSelect } from "metabase/hooks/use-list-select";
 import { usePagination } from "metabase/hooks/use-pagination";
@@ -314,7 +313,7 @@ export const CollectionContentView = ({
                   wrapped
                 >
                   {({
-                    list = [],
+                    list: unpinnedItems = [],
                     metadata = {},
                     loading: loadingUnpinnedItems,
                   }: {
@@ -322,9 +321,6 @@ export const CollectionContentView = ({
                     metadata: { total?: number };
                     loading: boolean;
                   }) => {
-                    const unpinnedItems = list.filter(
-                      item => item.id !== TRASH_COLLECTION.id,
-                    );
                     const hasPagination: boolean =
                       !!metadata.total && metadata.total > PAGE_SIZE;
 
