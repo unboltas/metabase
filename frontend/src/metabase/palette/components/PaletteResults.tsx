@@ -1,5 +1,5 @@
 import { useKBar, useMatches, KBarResults } from "kbar";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useDebounce, useKeyPressEvent } from "react-use";
 import _ from "underscore";
 
@@ -41,6 +41,12 @@ export const PaletteResults = () => {
   const { results } = useMatches();
 
   const processedResults = useMemo(() => processResults(results), [results]);
+
+  useEffect(() => {
+    if (processedResults[0] === "Search results") {
+      query.setActiveIndex(2);
+    }
+  }, [processedResults, query]);
 
   useKeyPressEvent("End", () => {
     const lastIndex = processedResults.length - 1;

@@ -1,4 +1,4 @@
-import { useRegisterActions } from "kbar";
+import { useRegisterActions, Priority } from "kbar";
 import { useMemo } from "react";
 import { push } from "react-router-redux";
 import { t } from "ttag";
@@ -42,6 +42,7 @@ export const useCommandPalette = ({
 
   const {
     data: searchResults,
+    metadata: searchMetadata,
     error: searchError,
     isLoading: isSearchLoading,
   } = useSearchListQuery<SearchResult>({
@@ -111,25 +112,47 @@ export const useCommandPalette = ({
       ];
     } else if (debouncedSearchText) {
       if (searchResults?.length) {
-        return searchResults.map(result => {
-          const wrappedResult = Search.wrapEntity(result, dispatch);
-          return {
-            id: `search-result-${result.id}`,
-            name: result.name,
-            icon: wrappedResult.getIcon().name,
+        return [
+          {
+            id: `search-results-metadata`,
+            name: `View all ${searchMetadata?.total} results for "${debouncedSearchText}"`,
             section: "search",
             keywords: debouncedSearchText,
+            icon: "link",
             perform: () => {
-              dispatch(closeModal());
-              dispatch(push(wrappedResult.getUrl()));
+              dispatch(
+                push({
+                  pathname: "search",
+                  query: {
+                    q: debouncedSearchText,
+                  },
+                }),
+              );
             },
-            extra: {
-              parentCollection: wrappedResult.getCollection().name,
-              isVerified: result.moderated_status === "verified",
-              database: result.database_name,
-            },
-          };
-        });
+            priority: Priority.HIGH,
+          },
+        ].concat(
+          searchResults.map(result => {
+            const wrappedResult = Search.wrapEntity(result, dispatch);
+            return {
+              id: `search-result-${result.id}`,
+              name: result.name,
+              icon: wrappedResult.getIcon().name,
+              section: "search",
+              keywords: debouncedSearchText,
+              priority: Priority.NORMAL,
+              perform: () => {
+                dispatch(closeModal());
+                dispatch(push(wrappedResult.getUrl()));
+              },
+              extra: {
+                parentCollection: wrappedResult.getCollection().name,
+                isVerified: result.moderated_status === "verified",
+                database: result.database_name,
+              },
+            };
+          }),
+        );
       } else {
         return [
           {
@@ -149,6 +172,7 @@ export const useCommandPalette = ({
     isSearchLoading,
     searchError,
     searchResults,
+    searchMetadata?.total,
   ]);
 
   useRegisterActions(searchResultActions, [searchResultActions]);
