@@ -151,8 +151,9 @@ export const ExpressionWidget = <Clause extends object = Lib.ExpressionClause>(
   }
 
   if (isExtractingColumn) {
-    const handleSubmit = (clause: Lib.ExpressionClause) => {
+    const handleSubmit = (clause: Lib.ExpressionClause, name: string) => {
       setClause(clause);
+      setName(name);
       setIsExtractingColumn(false);
     };
 
