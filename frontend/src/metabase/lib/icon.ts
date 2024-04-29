@@ -9,7 +9,8 @@ import type {
 
 export type ObjectWithModel = {
   model: SearchModel;
-  authority_level?: string;
+  authority_level?: "official" | null;
+  moderated_status?: "verified" | null;
   display?: CardDisplayType;
   type?: Collection["type"];
 };
@@ -57,4 +58,9 @@ export const getIconBase = (
   return { name: modelIconMap?.[item.model] ?? "unknown" };
 };
 
-export const getIcon = PLUGIN_COLLECTIONS.getIcon ?? getIconBase;
+export const getIcon = (...args) => {
+  if (PLUGIN_COLLECTIONS) {
+    return PLUGIN_COLLECTIONS.getIcon(...args);
+  }
+  return getIconBase(...args);
+};
