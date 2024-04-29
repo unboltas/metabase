@@ -155,6 +155,7 @@ export const ExpressionWidget = <Clause extends object = Lib.ExpressionClause>(
       setClause(clause);
       setName(name);
       setIsExtractingColumn(false);
+      setError(null);
     };
 
     return (
