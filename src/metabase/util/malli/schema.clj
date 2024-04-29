@@ -259,8 +259,16 @@
   (one of `\"true\"` or `true` or `\"false\"` or `false`.).
   Used by [[metabase.api.common/defendpoint]] to coerce the value for this schema to a boolean.
    Garanteed to evaluate to `true` or `false` when passed through a json decoder."
-  (-> [:enum {:decode/json (fn [b] (contains? #{"true" true} b))}
+  (-> [:enum {:decode/json (fn [b] (contains? #{"true" true} #p b))}
        "true" "false" true false]
+      (mu/with-api-error-message
+       (deferred-tru "value must be a valid boolean string (''true'' or ''false'')."))))
+
+(def MaybeBooleanValue
+  "Same as above, but allows distinguishing between `nil` (the user did not specify a value)
+  and `false` (the user specified `false`)."
+  (-> [:enum {:decode/json (fn [b] (some->> b (contains? #{"true" true})))}
+       "true" "false" true false nil]
       (mu/with-api-error-message
        (deferred-tru "value must be a valid boolean string (''true'' or ''false'')."))))
 
