@@ -69,6 +69,7 @@ import {
   IsNotAuthenticated,
 } from "./route-guards";
 import { getApplicationName } from "./selectors/whitelabel";
+import {PublicDashboardWrapper} from "metabase/public/containers/PublicDashboard/PublicDashboardWrapper";
 
 export const getRoutes = store => {
   const applicationName = getApplicationName(store.getState());
@@ -92,7 +93,7 @@ export const getRoutes = store => {
       {/* PUBLICLY SHARED LINKS */}
       <Route path="public">
         <Route path="question/:uuid" component={PublicQuestion} />
-        <Route path="dashboard/:uuid(/:tabSlug)" component={PublicDashboard} />
+        <Route path="dashboard/:uuid(/:tabSlug)" component={PublicDashboardWrapper} />
       </Route>
 
       {/* APP */}

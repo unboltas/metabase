@@ -68,7 +68,14 @@ const _addManyDashCards = createAction<NewDashboardCard[]>(
 );
 
 export const addDashCardToDashboard =
-  ({ dashId, tabId, dashcardOverrides }: AddDashCardOpts) =>
+  ({
+    dashId,
+    tabId,
+    dashcardOverrides,
+  }: AddDashCardOpts): ((
+    dispatch: Dispatch,
+    getState: GetState,
+  ) => NewDashboardCard) =>
   (dispatch: Dispatch, getState: GetState) => {
     const display = dashcardOverrides?.card?.display;
     const dashCardSize = display

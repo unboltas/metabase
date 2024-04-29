@@ -148,7 +148,7 @@ export const fetchDashboard = createAsyncThunk(
    * @async
    * @name fetchDashboard
    * @param {Object} args
-   *   @param {string} args.dashId
+   *   @param {import("metabase-types/api").DashboardId} args.dashId
    *   @param {Object} [args.queryParams]
    *   @param getState
    *   @param dispatch

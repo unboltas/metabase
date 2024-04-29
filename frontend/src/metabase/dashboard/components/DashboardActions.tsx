@@ -1,20 +1,45 @@
 import { t } from "ttag";
 
 import Tooltip from "metabase/core/components/Tooltip";
-import { DashboardEmbedAction } from "metabase/dashboard/components/DashboardEmbedAction/DashboardEmbedAction";
-import { DashboardHeaderButton } from "metabase/dashboard/components/DashboardHeader/DashboardHeader.styled";
-
 import {
   FullScreenButtonIcon,
   NightModeButtonIcon,
   RefreshWidgetButton,
-} from "./DashboardActions.styled";
+} from "metabase/dashboard/components/DashboardActions.styled";
+import { DashboardEmbedAction } from "metabase/dashboard/components/DashboardEmbedAction";
+import { DashboardHeaderButton } from "metabase/dashboard/components/DashboardHeader/DashboardHeader.styled";
+import type { Dashboard } from "metabase-types/api";
+
+type GetDashboardActionsProps = {
+  dashboard: Dashboard;
+
+  formInput?: any;
+
+  canManageSubscriptions?: boolean;
+  isAdmin?: boolean;
+  isEditing?: boolean;
+  isEmpty?: boolean;
+  isNightMode?: boolean;
+  isPublic?: false;
+
+  onSharingClick?: () => void;
+
+  refreshPeriod?: string;
+  onRefreshPeriodChange?: (period: string) => void;
+  setRefreshElapsedHook?: (hook: () => void) => void;
+
+  hasNightModeToggle?: false;
+  onNightModeChange?: (isNightMode: boolean) => void;
+
+  isFullscreen?: false;
+  onFullscreenChange?: (isFullscreen: boolean, optionClick: boolean) => void;
+};
 
 export const getDashboardActions = ({
-  canManageSubscriptions,
+  canManageSubscriptions = false,
   dashboard,
   formInput,
-  hasNightModeToggle,
+  hasNightModeToggle = false,
   isAdmin = false,
   isEditing = false,
   isEmpty = false,
@@ -27,7 +52,7 @@ export const getDashboardActions = ({
   onSharingClick,
   refreshPeriod,
   setRefreshElapsedHook,
-}) => {
+}: GetDashboardActionsProps) => {
   const buttons = [];
 
   const isLoaded = !!dashboard;
@@ -97,7 +122,7 @@ export const getDashboardActions = ({
             icon={
               <NightModeButtonIcon
                 isNightMode={isNightMode}
-                onClick={() => onNightModeChange(!isNightMode)}
+                onClick={() => onNightModeChange?.(!isNightMode)}
               />
             }
           />
@@ -116,7 +141,7 @@ export const getDashboardActions = ({
         <span>
           <DashboardHeaderButton
             icon={<FullScreenButtonIcon isFullscreen={isFullscreen} />}
-            onClick={e => onFullscreenChange(!isFullscreen, !e.altKey)}
+            onClick={e => onFullscreenChange?.(!isFullscreen, !e.altKey)}
           />
         </span>
       </Tooltip>,

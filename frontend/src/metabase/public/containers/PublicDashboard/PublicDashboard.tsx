@@ -1,5 +1,4 @@
 import cx from "classnames";
-import type { Location } from "history";
 import { useRef } from "react";
 import { useMount, useUnmount, useUpdateEffect } from "react-use";
 import _ from "underscore";
@@ -37,26 +36,25 @@ import ParametersS from "metabase/parameters/components/ParameterValueWidget.mod
 import EmbedFrame from "metabase/public/components/EmbedFrame/EmbedFrame";
 import { DashboardContainer } from "metabase/public/containers/PublicDashboard/PublicDashboard.styled";
 import { setErrorPage as setErrorPageAction } from "metabase/redux/app";
-import {
-  setEmbedDashboardEndpoints,
-  setPublicDashboardEndpoints,
-} from "metabase/services";
 import type { Mode } from "metabase/visualizations/click-actions/Mode";
 import { PublicMode } from "metabase/visualizations/click-actions/modes/PublicMode";
 import type { Dashboard, DashboardId, ParameterId } from "metabase-types/api";
 
 type PublicDashboardProps = {
-  location: Location;
-  params: {
-    uuid?: string;
-    token?: string;
-    dashboardId?: DashboardId;
-  };
+  dashboardId: DashboardId;
+  tab?: string;
   isFullscreen?: boolean;
   isNightMode?: boolean;
+  queryParams: any;
 };
 
-export const PublicDashboard = (props: PublicDashboardProps) => {
+export const PublicDashboard = ({
+  isFullscreen = false,
+  isNightMode = false,
+  dashboardId,
+  tab,
+  queryParams,
+}: PublicDashboardProps) => {
   const dispatch = useDispatch();
 
   const fetchDashboardCardData = (
@@ -67,7 +65,6 @@ export const PublicDashboard = (props: PublicDashboardProps) => {
   ) => dispatch(_fetchDashboardCardData(options));
   const setErrorPage = (error: any) => dispatch(setErrorPageAction(error));
 
-  const dashboardId = (props.params.uuid || props.params.token) as string;
   const dashboard: Dashboard | null = useSelector(getDashboardComplete);
   const parameters = useSelector(getParameters);
   const parameterValues = useSelector(getParameterValues);
@@ -77,18 +74,12 @@ export const PublicDashboard = (props: PublicDashboardProps) => {
   const prevProps = useRef({ dashboardId, selectedTabId, parameterValues });
 
   const initializePublicDashboard = async () => {
-    if (props.params.uuid) {
-      setPublicDashboardEndpoints();
-    } else if (props.params.token) {
-      setEmbedDashboardEndpoints();
-    }
-
     dispatch(initializeDashboard());
 
     const result: FetchDashboardResult = await dispatch(
       _fetchDashboard({
         dashId: dashboardId,
-        queryParams: props.location.query,
+        queryParams,
       }),
     ).unwrap();
 
@@ -156,7 +147,12 @@ export const PublicDashboard = (props: PublicDashboardProps) => {
   };
 
   const buttons = !isWithinIframe()
-    ? getDashboardActions({ ...props, isPublic: true })
+    ? getDashboardActions({
+        dashboard,
+        isFullscreen: isFullscreen,
+        isNightMode: isNightMode,
+        isPublic: true,
+      })
     : [];
 
   return (
@@ -181,16 +177,16 @@ export const PublicDashboard = (props: PublicDashboardProps) => {
       dashboardTabs={
         dashboard?.tabs &&
         dashboard.tabs.length > 1 && (
-          <DashboardTabs dashboardId={dashboardId} location={props.location} />
+          <DashboardTabs dashboardId={dashboardId} location={location} />
         )
       }
     >
       <LoadingAndErrorWrapper
         className={cx({
-          [DashboardS.DashboardFullscreen]: props.isFullscreen,
-          [DashboardS.DashboardNight]: props.isNightMode,
-          [ParametersS.DashboardNight]: props.isNightMode,
-          [ColorS.DashboardNight]: props.isNightMode,
+          [DashboardS.DashboardFullscreen]: isFullscreen,
+          [DashboardS.DashboardNight]: isNightMode,
+          [ParametersS.DashboardNight]: isNightMode,
+          [ColorS.DashboardNight]: isNightMode,
         })}
         loading={!dashboard}
       >
