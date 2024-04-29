@@ -115,7 +115,7 @@ export const useCommandPalette = ({
         return [
           {
             id: `search-results-metadata`,
-            name: `View all ${searchMetadata?.total} results for "${debouncedSearchText}"`,
+            name: `View and filter all ${searchMetadata?.total} results`,
             section: "search",
             keywords: debouncedSearchText,
             icon: "link",
@@ -135,7 +135,7 @@ export const useCommandPalette = ({
           searchResults.map(result => {
             const wrappedResult = Search.wrapEntity(result, dispatch);
             return {
-              id: `search-result-${result.id}`,
+              id: `search-result-${result.model}-${result.id}`,
               name: result.name,
               icon: wrappedResult.getIcon().name,
               section: "search",
