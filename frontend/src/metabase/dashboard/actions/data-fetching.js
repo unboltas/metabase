@@ -141,6 +141,23 @@ let fetchDashboardCancellation;
 
 export const fetchDashboard = createAsyncThunk(
   "metabase/dashboard/FETCH_DASHBOARD",
+  /**
+   * This function fetches a dashboard from the Metabase API.
+   *
+   * @export
+   * @async
+   * @name fetchDashboard
+   * @param {Object} args
+   *   @param {string} args.dashId
+   *   @param {Object} [args.queryParams]
+   *   @param getState
+   *   @param dispatch
+   *   @param rejectWithValue
+   *   @param {Object} [args.options]
+   *     @param {boolean} [args.options.preserveParameters=false]
+   *     @param {boolean} [args.options.clearCache=true]
+   * @returns {Promise<import("metabase/dashboard/types").FetchDashboardResult>}
+   */
   async (
     {
       dashId,
@@ -293,7 +310,19 @@ export const fetchDashboard = createAsyncThunk(
 
 export const fetchCardData = createThunkAction(
   FETCH_CARD_DATA,
-  function (card, dashcard, { reload, clearCache, ignoreCache } = {}) {
+  /**
+   *  @param card {import("metabase-types/api").Card}
+   *  @param dashcard {import("metabase-types/api").DashboardCard}
+   *  @param options
+   *  @param {boolean} [options.reload=false]
+   *  @param {boolean} [options.clearCache=false]
+   *  @param {boolean} [options.ignoreCache=false]
+   */
+  function (
+    card,
+    dashcard,
+    { reload = false, clearCache = false, ignoreCache = false } = {},
+  ) {
     return async function (dispatch, getState) {
       dispatch({
         type: FETCH_CARD_DATA_PENDING,
@@ -480,8 +509,22 @@ export const fetchCardData = createThunkAction(
   },
 );
 
+/**
+ * @export
+ * @async
+ * @name fetchDashboard
+ * @param {Object} args
+ *  @param {boolean} [args.isRefreshing=false]
+ *  @param {boolean} [args.reload=false]
+ *  @param {boolean} [args.clearCache=false]
+ */
 export const fetchDashboardCardData =
-  ({ isRefreshing, ...options } = {}) =>
+  ({
+    isRefreshing = false,
+    reload = false,
+    clearCache = false,
+    ...options
+  } = {}) =>
   (dispatch, getState) => {
     const dashboard = getDashboardComplete(getState());
     const selectedTabId = getSelectedTabId(getState());

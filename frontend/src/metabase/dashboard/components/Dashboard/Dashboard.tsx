@@ -455,7 +455,6 @@ function DashboardInner(props: DashboardProps) {
       <DashboardGridConnected
         {...props}
         isNightMode={shouldRenderAsNightMode}
-        onEditingChange={handleSetEditing}
       />
     );
   };
