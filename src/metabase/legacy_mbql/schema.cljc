@@ -784,13 +784,28 @@
    ;; default true
    [:case-sensitive {:optional true} :boolean]])
 
-(defclause starts-with, field StringExpressionArg, string-or-field StringExpressionArg, options (optional StringFilterOptions))
-(defclause ends-with,   field StringExpressionArg, string-or-field StringExpressionArg, options (optional StringFilterOptions))
-(defclause contains,    field StringExpressionArg, string-or-field StringExpressionArg, options (optional StringFilterOptions))
+(defclause starts-with
+  field StringExpressionArg
+  string-or-field StringExpressionArg
+  more-values-or-fields (rest StringExpressionArg)
+  options (optional StringFilterOptions))
+(defclause ends-with
+  field StringExpressionArg
+  string-or-field StringExpressionArg
+  more-values-or-fields (rest StringExpressionArg)
+  options (optional StringFilterOptions))
+(defclause contains
+  field StringExpressionArg
+  string-or-field StringExpressionArg
+  more-values-or-fields (rest StringExpressionArg)
+  options (optional StringFilterOptions))
 
 ;; SUGAR: this is rewritten as [:not [:contains ...]]
 (defclause ^:sugar does-not-contain
-  field StringExpressionArg, string-or-field StringExpressionArg, options (optional StringFilterOptions))
+  field StringExpressionArg
+  string-or-field StringExpressionArg
+  more-values-or-fields (rest StringExpressionArg)
+  options (optional StringFilterOptions))
 
 (def ^:private TimeIntervalOptions
   ;; Should we include partial results for the current day/month/etc? Defaults to `false`; set this to `true` to
