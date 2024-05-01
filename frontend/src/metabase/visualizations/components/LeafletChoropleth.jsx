@@ -27,21 +27,8 @@ const LeafletChoropleth = ({
       const map = L.map(element, {
         attributionControl: false,
         fadeAnimation: false,
-        markerZoomAnimation: false,
         trackResize: true,
-        worldCopyJump: true,
-        zoomAnimation: false,
-        zoomSnap: 0,
-
-        // disable zoom controls
-        dragging: false,
-        tap: false,
-        zoomControl: false,
-        touchZoom: false,
-        doubleClickZoom: false,
-        scrollWheelZoom: false,
-        boxZoom: false,
-        keyboard: false,
+        worldCopyJump: true
       });
 
       const style = feature => ({
